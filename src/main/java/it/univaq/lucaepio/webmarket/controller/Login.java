@@ -31,7 +31,7 @@ public class Login extends HttpServlet {
        try {
            action_default(request, response);
        } catch (IOException ex) {
-           Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
        }
 
     }
@@ -60,7 +60,7 @@ public class Login extends HttpServlet {
        try {
            processRequest(request, response);
        } catch (TemplateManagerException ex) {
-           Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
 
@@ -78,7 +78,7 @@ public class Login extends HttpServlet {
        try {
            processRequest(request, response);
        } catch (TemplateManagerException ex) {
-           Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
 
