@@ -31,7 +31,7 @@ public class Login extends HttpServlet {
         String password = request.getParameter("p");
 
         if (!username.isEmpty() && !password.isEmpty()) {
-            response.sendRedirect("homepage");
+            response.sendRedirect("home");
         }else{
             response.sendRedirect("_404");
         }
