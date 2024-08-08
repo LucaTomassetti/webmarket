@@ -2,6 +2,11 @@ package it.univaq.lucaepio.webmarket.model;
 
 import jakarta.persistence.*;
 
+/**
+ * 
+ * @author lucat
+ */
+
 @Entity
 @Table(name = "Users")
 public class User {

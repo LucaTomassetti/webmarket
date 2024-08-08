@@ -11,6 +11,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Fornisce la logica di business specifica per le operazioni sulle categorie. 
+ * Utilizza GenericDAO per l'accesso ai dati, aggiungendo eventuali metodi o validazioni necessarie.
+ * 
+ * @author lucat
+ */
 public class CategoryService {
     private static final Logger LOGGER = Logger.getLogger(CategoryService.class.getName());
     private GenericDAO<Category, Long> categoryDAO;

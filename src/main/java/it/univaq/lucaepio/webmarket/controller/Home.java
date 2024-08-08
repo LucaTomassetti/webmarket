@@ -18,6 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ * @author lucat
+ */
+
 @WebServlet("/home")
 public class Home extends HttpServlet {
     private CategoryService categoryService;
@@ -34,9 +39,10 @@ public class Home extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //Controllo se l'utente è autenticato
         HttpSession session = request.getSession(false);
         User currentUser = (User) session.getAttribute("user");
-
+        //Se non lo è, lo reindirizzo nel login
         if (currentUser == null) {
             response.sendRedirect("login");
             return;

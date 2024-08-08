@@ -29,17 +29,43 @@ public class Category {
 
     @Column(columnDefinition = "json")
     private String subcategoriesJson;
-
+    
+    /**
+     * Questo metodo serve per convertire una stringa JSON (memorizzata nel campo subcategoriesJson) in una struttura dati Java. 
+     * La chiave esterna è il nome della sottocategoria.
+     * Il valore è un'altra mappa che rappresenta le caratteristiche della sottocategoria (la chiave è il nome della caratteristica
+     * mentre il valore è il valore della caratteristica)
+     * Es. : {
+                "Laptop": {
+                  "RAM": "8GB",
+                  "CPU": "Intel i5",
+                  "Storage": "256GB SSD"
+                },
+                "Smartphone": {
+                  "Screen": "6.1 inch",
+                  "Camera": "12MP",
+                  "Battery": "3000mAh"
+                }
+              }
+     * 
+     * @return 
+     */
     public Map<String, Map<String, String>> getSubcategoriesWithCharacteristics() {
+        //gestisce il caso di nessuna sottocategoria, anche per evitare errori
         if (subcategoriesJson == null || subcategoriesJson.isEmpty()) {
             return new HashMap<>();
         }
-        
+        //Creo un'istanza di ObjectMapper dalla libreria Jackson.
+        //Questa classe è usata per convertire tra JSON e oggetti Java.
         ObjectMapper mapper = new ObjectMapper();
         try {
+            //readValue converte la stringa JSON in un oggetto Java.
+            //TypeReference specifica il tipo esatto in cui convertire il JSON.
+            //In questo caso, stiamo convertendo in Map<String, Map<String, String>>.
             return mapper.readValue(subcategoriesJson, 
                 new TypeReference<Map<String, Map<String, String>>>() {});
         } catch (IOException e) {
+            //In caso di errore, viene restituita una mappa vuota.
             e.printStackTrace();
             return new HashMap<>();
         }

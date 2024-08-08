@@ -15,6 +15,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @author lucat
+ */
+
 @WebServlet("/register")
 public class Register extends HttpServlet {
     private UserService userService;
@@ -32,10 +37,12 @@ public class Register extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Map<String, Object> data = new HashMap<>();
+        //Carico il template per la registrazione
         processTemplate(response, "register.ftl.html", data);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //Prelevo i dati dalla form
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -43,7 +50,9 @@ public class Register extends HttpServlet {
 
         Map<String, Object> data = new HashMap<>();
         try {
+            //Registro l'utente salvandolo nel DB
             User user = userService.registerUser(username, email, password, User.UserType.valueOf(userType));
+            //Reindirizzo nella pagina del login
             response.sendRedirect("login");
         } catch (Exception e) {
             data.put("error", "Errore durante la registrazione: " + e.getMessage());

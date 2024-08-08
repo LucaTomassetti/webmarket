@@ -7,6 +7,12 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+/**
+ * Questa classe è responsabile dell'inizializzazione e della configurazione di FreeMarker per l'intera applicazione web. 
+ * Assicura che FreeMarker sia correttamente configurato e disponibile per tutte le servlet che necessitano di renderizzare template.
+ * 
+ * @author lucat
+ */
 @WebListener
 public class FreemarkerConfig implements ServletContextListener {
 

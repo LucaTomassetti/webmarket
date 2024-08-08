@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Gestisce la logica di business relativa agli utenti, come la registrazione, l'autenticazione e altre operazioni specifiche degli utenti. 
+ * Utilizza GenericDAO per l'accesso ai dati e implementa logiche aggiuntive come l'hashing delle password.
+ * 
+ * @author lucat
+ */
 public class UserService {
     private static final Logger LOGGER = Logger.getLogger(UserService.class.getName());
     private GenericDAO<User, Long> userDAO;

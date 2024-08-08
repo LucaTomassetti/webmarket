@@ -16,6 +16,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @author lucat
+ */
+
 @WebServlet("/login")
 public class Login extends HttpServlet {
     private UserService userService;

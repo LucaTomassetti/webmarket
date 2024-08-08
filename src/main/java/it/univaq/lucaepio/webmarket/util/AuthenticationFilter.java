@@ -13,7 +13,11 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- *
+ * Questo filtro implementa un meccanismo di autenticazione per l'applicazione. 
+ * Intercetta tutte le richieste e verifica se l'utente è autenticato. 
+ * Se l'utente non è autenticato e sta cercando di accedere a una risorsa protetta, viene reindirizzato alla pagina di login. 
+ * Questo assicura che solo gli utenti autenticati possano accedere alle parti protette dell'applicazione.
+ * 
  * @author lucat
  */
 

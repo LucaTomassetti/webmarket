@@ -4,6 +4,14 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+/**
+ * Implementa l'interfaccia GenericDAO, fornendo l'implementazione concreta delle operazioni CRUD utilizzando Hibernate. 
+ * Questa classe è progettata per essere estesa da DAO specifici per entità, se necessario.
+ * 
+ * @author lucat
+ * @param <T>
+ * @param <ID> 
+ */
 public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
     protected Class<T> entityClass;
 

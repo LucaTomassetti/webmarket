@@ -4,39 +4,58 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!-- Database connection settings -->
+        <!-- 
+        Il file hibernate.cfg.xml centralizza tutte le impostazioni relative alla connessione al database,
+        al dialetto SQL, alla gestione dello schema, al logging e alla mappatura delle entità.
+        
+        Vantaggi principali:
+        1. Configurazioni separate dal codice
+        2. Portabilità tra diversi ambienti (sviluppo, test, produzione)
+        -->
+
+        <!-- Configurazioni della connessione al database 
+             Queste proprietà specificano come Hibernate si connette al database -->
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/webmarket?serverTimezone=UTC</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">pippo</property>
 
-        <!-- JDBC connection pool settings -->
+        <!-- Dialetto SQL 
+             Indica a Hibernate quale dialetto SQL utilizzare per il database specifico.
+             Questo permette a Hibernate di generare SQL ottimizzato per il database in uso. -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- Gestione dello schema del database 
+             La proprietà hibernate.hbm2ddl.auto controlla come Hibernate gestisce lo schema del database.
+             'update' aggiorna lo schema se necessario, mantenendo i dati esistenti. -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Configurazione del logging 
+             Queste proprietà controllano la visualizzazione e la formattazione delle query SQL generate. -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <!-- Mappatura delle classi entità 
+             Elencare qui tutte le classi entità che Hibernate deve gestire.
+             Queste classi sono mappate alle tabelle del database. -->
+        <mapping class="it.univaq.lucaepio.webmarket.model.User"/>
+        <mapping class="it.univaq.lucaepio.webmarket.model.Category"/>
+        <!-- Aggiungi qui altre classi entità se necessario -->
+
+        <!-- 
+        Altre possibili configurazioni (decommentare o aggiungere se necessario):
+        
+        - Configurazioni di performance:
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+
+        - Configurazioni della connection pool:
         <property name="hibernate.c3p0.min_size">5</property>
         <property name="hibernate.c3p0.max_size">20</property>
         <property name="hibernate.c3p0.timeout">300</property>
-        <property name="hibernate.c3p0.max_statements">50</property>
-        <property name="hibernate.c3p0.idle_test_period">3000</property>
 
-        <!-- Specify dialect -->
-        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-
-        <!-- Echo all executed SQL to stdout -->
-        <property name="hibernate.show_sql">true</property>
-
-        <!-- Drop and re-create the database schema on startup -->
-        <property name="hibernate.hbm2ddl.auto">update</property>
-
-        <!-- Names the annotated entity class -->
-        <mapping class="it.univaq.lucaepio.webmarket.model.User"/>
-        <mapping class="it.univaq.lucaepio.webmarket.model.Category"/>
-        <!--
-        <mapping class="it.univaq.lucaepio.webmarket.model.ProductCharacteristic"/>
-        <mapping class="it.univaq.lucaepio.webmarket.model.PurchaseRequest"/>
-        <mapping class="it.univaq.lucaepio.webmarket.model.RequestCharacteristic"/>
-        <mapping class="it.univaq.lucaepio.webmarket.model.PurchaseProposal"/>
-        <mapping class="it.univaq.lucaepio.webmarket.model.OrderStatus"/>
-        <mapping class="it.univaq.lucaepio.webmarket.model.Payment"/>
+        - Configurazioni delle transazioni:
+        <property name="hibernate.current_session_context_class">thread</property>
         -->
-        <!-- Add other entity mappings here -->
     </session-factory>
 </hibernate-configuration>

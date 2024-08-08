@@ -11,6 +11,12 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Questa classe gestisce la chiusura corretta delle risorse del database quando l'applicazione viene terminata. 
+ * In particolare, si assicura che la SessionFactory di Hibernate sia chiusa e che i driver JDBC siano deregistrati, prevenendo potenziali memory leak.
+ * 
+ * @author lucat
+ */
 @WebListener
 public class MySQLContextListener implements ServletContextListener {
 
