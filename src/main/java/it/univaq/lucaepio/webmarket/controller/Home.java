@@ -1,68 +1,63 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package it.univaq.lucaepio.webmarket.controller;
+
 import it.univaq.lucaepio.webmarket.model.Category;
+import it.univaq.lucaepio.webmarket.model.User;
 import it.univaq.lucaepio.webmarket.service.CategoryService;
-import it.univaq.lucaepio.webmarket.util.JPAUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-import jakarta.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author lucat
- */
-
 @WebServlet("/home")
 public class Home extends HttpServlet {
-
+    private CategoryService categoryService;
     private Configuration freemarkerConfig;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        freemarkerConfig = new Configuration(Configuration.VERSION_2_3_31);
-        freemarkerConfig.setServletContextForTemplateLoading(getServletContext(), "/templates");
-        freemarkerConfig.setDefaultEncoding("UTF-8");
+        categoryService = new CategoryService();
+        freemarkerConfig = (Configuration) getServletContext().getAttribute("freemarker_config");
+        if (freemarkerConfig == null) {
+            throw new ServletException("FreeMarker configuration not found in servlet context");
+        }
     }
 
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        EntityManager em = JPAUtil.getEntityManager();
+        HttpSession session = request.getSession(false);
+        User currentUser = (User) session.getAttribute("user");
+
+        if (currentUser == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
+        List<Category> categories = categoryService.getAllCategories();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("user", currentUser);
+        data.put("categories", categories);
+
+        processTemplate(response, "home.ftl.html", data);
+    }
+
+    private void processTemplate(HttpServletResponse response, String templateName, Map<String, Object> data) throws IOException {
+        Template template = freemarkerConfig.getTemplate(templateName);
+        response.setContentType("text/html");
         try {
-            CategoryService categoryService = new CategoryService(em);
-            List<Category> categories = categoryService.getAllCategories();
-
-            // Debug: print categories
-            System.out.println("Categories: " + categories);
-            for (Category category : categories) {
-                System.out.println("Category: " + category.getName() + ", Subcategories: " + category.getSubcategoriesWithCharacteristics());
-            }
-
-            Map<String, Object> dataModel = new HashMap<>();
-            dataModel.put("categories", categories);
-
-            Template template = freemarkerConfig.getTemplate("home.ftl");
-            response.setContentType("text/html");
-            response.setCharacterEncoding("UTF-8");
-            template.process(dataModel, response.getWriter());
+            template.process(data, response.getWriter());
         } catch (TemplateException e) {
-            throw new ServletException("Error processing template", e);
-        } finally {
-            em.close();
+            throw new IOException("Error processing FreeMarker template", e);
         }
     }
 }

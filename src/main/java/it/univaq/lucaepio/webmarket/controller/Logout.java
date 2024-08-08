@@ -1,7 +1,12 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package it.univaq.lucaepio.webmarket.controller;
 
 import it.univaq.lucaepio.webmarket.model.User;
 import it.univaq.lucaepio.webmarket.service.UserService;
+import it.univaq.lucaepio.webmarket.util.FreemarkerConfig;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -16,55 +21,39 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet("/login")
-public class Login extends HttpServlet {
-    private UserService userService;
+/**
+ *
+ * @author lucat
+ */
+
+@WebServlet("/logout")
+public class Logout extends HttpServlet{
     private Configuration freemarkerConfig;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        userService = new UserService();
         freemarkerConfig = (Configuration) getServletContext().getAttribute("freemarker_config");
         if (freemarkerConfig == null) {
             throw new ServletException("FreeMarker configuration not found in servlet context");
         }
     }
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        if(session.getAttribute("user") != null){
-            response.sendRedirect("home");
-        }else{
-            
-        }
-        processTemplate(response, "login.ftl.html", new HashMap<>());
+        session.invalidate();
+        response.sendRedirect("login");
+        renderTemplate(response, "login.ftl.html", new HashMap<>());
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-
-        User user = userService.authenticateUser(username, password);
-
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-            response.sendRedirect("home");
-        } else {
-            Map<String, Object> data = new HashMap<>();
-            data.put("error", "Username o password non validi");
-            processTemplate(response, "login.ftl.html", data);
-        }
-    }
-
-    private void processTemplate(HttpServletResponse response, String templateName, Map<String, Object> data) throws IOException {
-        Template template = freemarkerConfig.getTemplate(templateName);
+    private void renderTemplate(HttpServletResponse response, String templateName, Map<String, Object> dataModel) throws IOException {
         response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
         try {
-            template.process(data, response.getWriter());
+            Template template = freemarkerConfig.getTemplate(templateName);
+            template.process(dataModel, response.getWriter());
         } catch (TemplateException e) {
             throw new IOException("Error processing FreeMarker template", e);
         }
     }
 }
+  

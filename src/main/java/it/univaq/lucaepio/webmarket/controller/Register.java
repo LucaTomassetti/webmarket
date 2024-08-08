@@ -11,13 +11,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet("/login")
-public class Login extends HttpServlet {
+@WebServlet("/register")
+public class Register extends HttpServlet {
     private UserService userService;
     private Configuration freemarkerConfig;
 
@@ -32,29 +31,23 @@ public class Login extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        if(session.getAttribute("user") != null){
-            response.sendRedirect("home");
-        }else{
-            
-        }
-        processTemplate(response, "login.ftl.html", new HashMap<>());
+        Map<String, Object> data = new HashMap<>();
+        processTemplate(response, "register.ftl.html", data);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
+        String email = request.getParameter("email");
         String password = request.getParameter("password");
+        String userType = request.getParameter("userType");
 
-        User user = userService.authenticateUser(username, password);
-
-        if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-            response.sendRedirect("home");
-        } else {
-            Map<String, Object> data = new HashMap<>();
-            data.put("error", "Username o password non validi");
-            processTemplate(response, "login.ftl.html", data);
+        Map<String, Object> data = new HashMap<>();
+        try {
+            User user = userService.registerUser(username, email, password, User.UserType.valueOf(userType));
+            response.sendRedirect("login");
+        } catch (Exception e) {
+            data.put("error", "Errore durante la registrazione: " + e.getMessage());
+            processTemplate(response, "register.ftl.html", data);
         }
     }
 

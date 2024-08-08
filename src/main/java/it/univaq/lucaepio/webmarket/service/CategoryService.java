@@ -1,128 +1,78 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package it.univaq.lucaepio.webmarket.service;
-import it.univaq.lucaepio.webmarket.model.Category;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.persistence.*;
-import java.util.List;
-import java.util.Map;
 
-/**
- *
- * @author lucat
- */
+import it.univaq.lucaepio.webmarket.dao.GenericDAO;
+import it.univaq.lucaepio.webmarket.dao.GenericDAOImpl;
+import it.univaq.lucaepio.webmarket.model.Category;
+import it.univaq.lucaepio.webmarket.dao.PersistentManager;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CategoryService {
-    private EntityManager em;
+    private static final Logger LOGGER = Logger.getLogger(CategoryService.class.getName());
+    private GenericDAO<Category, Long> categoryDAO;
 
-    public CategoryService(EntityManager em) {
-        this.em = em;
+    public CategoryService() {
+        this.categoryDAO = new GenericDAOImpl<>(Category.class);
     }
 
-    public List<Category> getAllCategories() {
-        TypedQuery<Category> query = em.createQuery("SELECT c FROM Category c", Category.class);
-        return query.getResultList();
-    }
-
-    public Category getCategoryById(Long id) {
-        return em.find(Category.class, id);
-    }
-
-    public void createCategory(String name, Map<String, Map<String, String>> subcategories) {
-        em.getTransaction().begin();
-        try {
-            Category category = new Category();
-            category.setName(name);
-            
-            ObjectMapper mapper = new ObjectMapper();
-            String subcategoriesJson = mapper.writeValueAsString(subcategories);
-            category.setSubcategoriesJson(subcategoriesJson);
-            
-            em.persist(category);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw new RuntimeException("Error creating category", e);
+    public Category createCategory(String name, String subcategoriesJson) {
+        try (Session session = PersistentManager.getInstance().getSession()) {
+            Transaction tx = session.beginTransaction();
+            try {
+                Category category = new Category();
+                category.setName(name);
+                category.setSubcategoriesJson(subcategoriesJson);
+                category = categoryDAO.save(category);
+                tx.commit();
+                return category;
+            } catch (Exception e) {
+                tx.rollback();
+                LOGGER.log(Level.SEVERE, "Errore durante la creazione della categoria", e);
+                throw new RuntimeException("Error creating category", e);
+            }
         }
     }
 
-    public void updateCategory(Long id, String name, Map<String, Map<String, String>> subcategories) {
-        em.getTransaction().begin();
-        try {
-            Category category = em.find(Category.class, id);
-            if (category != null) {
-                category.setName(name);
-                
-                ObjectMapper mapper = new ObjectMapper();
-                String subcategoriesJson = mapper.writeValueAsString(subcategories);
-                category.setSubcategoriesJson(subcategoriesJson);
-                
-                em.merge(category);
+    public List<Category> getAllCategories() {
+        return categoryDAO.findAll();
+    }
+
+    public Category getCategoryById(Long id) {
+        return categoryDAO.findById(id);
+    }
+
+    public void updateCategory(Category category) {
+        try (Session session = PersistentManager.getInstance().getSession()) {
+            Transaction tx = session.beginTransaction();
+            try {
+                categoryDAO.update(category);
+                tx.commit();
+            } catch (Exception e) {
+                tx.rollback();
+                LOGGER.log(Level.SEVERE, "Errore durante l'aggiornamento della categoria", e);
+                throw new RuntimeException("Error updating category", e);
             }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw new RuntimeException("Error updating category", e);
         }
     }
 
     public void deleteCategory(Long id) {
-        em.getTransaction().begin();
-        try {
-            Category category = em.find(Category.class, id);
-            if (category != null) {
-                em.remove(category);
+        try (Session session = PersistentManager.getInstance().getSession()) {
+            Transaction tx = session.beginTransaction();
+            try {
+                Category category = categoryDAO.findById(id);
+                if (category != null) {
+                    categoryDAO.delete(category);
+                }
+                tx.commit();
+            } catch (Exception e) {
+                tx.rollback();
+                LOGGER.log(Level.SEVERE, "Errore durante l'eliminazione della categoria", e);
+                throw new RuntimeException("Error deleting category", e);
             }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw new RuntimeException("Error deleting category", e);
-        }
-    }
-
-    public void addSubcategory(Long categoryId, String subcategoryName, Map<String, String> characteristics) {
-        em.getTransaction().begin();
-        try {
-            Category category = em.find(Category.class, categoryId);
-            if (category != null) {
-                Map<String, Map<String, String>> subcategories = category.getSubcategoriesWithCharacteristics();
-                subcategories.put(subcategoryName, characteristics);
-                
-                ObjectMapper mapper = new ObjectMapper();
-                String subcategoriesJson = mapper.writeValueAsString(subcategories);
-                category.setSubcategoriesJson(subcategoriesJson);
-                
-                em.merge(category);
-            }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw new RuntimeException("Error adding subcategory", e);
-        }
-    }
-
-    public void removeSubcategory(Long categoryId, String subcategoryName) {
-        em.getTransaction().begin();
-        try {
-            Category category = em.find(Category.class, categoryId);
-            if (category != null) {
-                Map<String, Map<String, String>> subcategories = category.getSubcategoriesWithCharacteristics();
-                subcategories.remove(subcategoryName);
-                
-                ObjectMapper mapper = new ObjectMapper();
-                String subcategoriesJson = mapper.writeValueAsString(subcategories);
-                category.setSubcategoriesJson(subcategoriesJson);
-                
-                em.merge(category);
-            }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw new RuntimeException("Error removing subcategory", e);
         }
     }
 }
