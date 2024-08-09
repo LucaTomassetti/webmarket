@@ -1,0 +1,17 @@
+.card-icon-top {
+    font-size: 8rem;
+    margin: 1rem auto;
+}
+.container{
+    margin: 10rem auto;
+}
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+.card-link:hover {
+    color: inherit;
+}
+.card {
+    transition: border-color 0.5s ease;
+}

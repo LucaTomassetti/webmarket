@@ -14,14 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 
 /**
  * 
  * @author lucat
  */
 
-@WebServlet("/register")
-public class Register extends HttpServlet {
+@WebServlet("/registerUsers")
+public class RegisterUsers extends HttpServlet {
     private UserService userService;
     private Configuration freemarkerConfig;
 
@@ -36,9 +37,19 @@ public class Register extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //Controllo se l'admin è autenticato
+        HttpSession session = request.getSession(false);
+        User currentUser = (User) session.getAttribute("user");
+        //Se non lo è, lo reindirizzo nel login
+        if (currentUser == null && currentUser.getUserType() != User.UserType.Amministratore) {
+            response.sendRedirect("login");
+            return;
+        }
         Map<String, Object> data = new HashMap<>();
+        data.put("registerUsers", true);
+        data.put("user", currentUser);
         //Carico il template per la registrazione
-        processTemplate(response, "register.ftl.html", data);
+        processTemplate(response, "registerUsers.ftl.html", data);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

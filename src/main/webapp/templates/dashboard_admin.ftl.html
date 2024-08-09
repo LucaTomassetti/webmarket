@@ -1,0 +1,55 @@
+<#include '/outline.ftl.html'>
+<div class="d-flex justify-content-center mt-5">
+    <h2>Benvenuto, ${user.getUsername()}</h2>
+</div>
+<div class="container">
+    <div class="row justify-content-evenly align-items-center">
+        <!-- Ulteriore design
+        <div class="col-md-4 col-12-sm">
+            <div class="card h-100 text-center">
+                <img src="path/to/green-book-icon.png" class="card-img-top" alt="Categoria Padre">
+                <div class="card-body">
+                    <h5 class="card-title">Gestisci categorie e caratteristiche</h5>
+                    <p class="card-text">Inserisci, modifica o cancella una categoria</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-12-sm">
+            <div class="card h-100 text-center">
+                <img src="path/to/person-icon.png" class="card-img-top" alt="Gestisci ordinanti">
+                <div class="card-body">
+                    <h5 class="card-title">Gestisci utenti</h5>
+                    <p class="card-text">Inserisci, modifica o cancella gli utenti</p>
+                </div>
+            </div>
+        </div>
+        -->
+        <div class="col-md-6 col-12-sm mb-5 d-flex justify-content-evenly">
+            <a href="#" class="card-link">
+                <div class="card h-100 border-dark border-2 text-center shadow-lg" style="max-width: 18rem;">
+                    <div class="card-header">
+                        <i class="bi bi-card-heading card-icon-top"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Gestisci categorie</h5>
+                        <p class="card-text">Inserisci, modifica o cancella una categoria</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-12-sm mb-5 d-flex justify-content-evenly">
+            <a href="/webmarket/registerUsers" class="card-link">
+                <div class="card h-100 border-dark border-2 text-center shadow-lg" style="max-width: 18rem;">
+                    <div class="card-header">
+                        <i class="bi bi-people card-icon-top"></i>
+                    </div>
+                    <div class="card-body">
+                      <h5 class="card-title">Gestisci utenti</h5>
+                      <p class="card-text">Inserisci, modifica o cancella gli utenti</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<#include '/footer.ftl.html'>

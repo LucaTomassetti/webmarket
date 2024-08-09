@@ -47,14 +47,19 @@ public class Home extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
-        List<Category> categories = categoryService.getAllCategories();
-
         Map<String, Object> data = new HashMap<>();
         data.put("user", currentUser);
-        data.put("categories", categories);
-
-        processTemplate(response, "home.ftl.html", data);
+    
+        if(currentUser.getUserType() == User.UserType.Amministratore){
+            //List<Category> categories = categoryService.getAllCategories();
+            //data.put("categories", categories);
+            processTemplate(response, "dashboard_admin.ftl.html", data);
+        }else if(currentUser.getUserType() == User.UserType.Ordinante){
+            processTemplate(response, "dashboard_ordinante.ftl.html", data);
+        }
+        else if(currentUser.getUserType() == User.UserType.Tecnico){
+            processTemplate(response, "dashboard_tecnico.ftl.html", data);
+        }
     }
 
     private void processTemplate(HttpServletResponse response, String templateName, Map<String, Object> data) throws IOException {

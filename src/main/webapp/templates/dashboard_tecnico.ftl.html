@@ -1,0 +1,50 @@
+<#include '/outline.ftl.html'>
+<div class="d-flex justify-content-center mt-5">
+    <h2>Benvenuto, ${user.getUsername()}</h2>
+</div>
+<div class="container">
+    <div class="row justify-content-evenly align-items-center">
+        <div class="col-md-4 col-12-sm mb-5 d-flex justify-content-evenly">
+            <a href="#" class="card-link">
+                <div class="card h-100 border-dark border-2 text-center shadow-lg" style="max-width: 18rem;">
+                    <div class="card-header">
+                        <i class="bi bi-clipboard card-icon-top"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Prendi in carico</h5>
+                        <p class="card-text">Visualizza e prendi in carico le nuove richieste</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-12-sm mb-5 d-flex justify-content-evenly">
+            <a href="#" class="card-link">
+                <div class="card h-100 border-dark border-2 text-center shadow-lg" style="max-width: 18rem;">
+                    <div class="card-header">
+                        <i class="bi bi-clipboard-plus card-icon-top"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Richieste prese in carico</h5>
+                    <p class="card-text">Visualizza le tue richieste prese in carico e crea una proposta</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-12-sm mb-5 d-flex justify-content-evenly">
+            <a href="#" class="card-link">
+                <div class="card h-100 border-dark border-2 text-center shadow-lg" style="max-width: 18rem;">
+                    <div class="card-header">
+                        <i class="bi bi-card-checklist card-icon-top"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Proposte</h5>
+                    <p class="card-text">Visualizza lo stato delle tue proposte</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<#include '/footer.ftl.html'>
+
+

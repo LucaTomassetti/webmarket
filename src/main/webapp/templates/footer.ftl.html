@@ -1,0 +1,22 @@
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cardLinks = document.querySelectorAll('.card-link');
+
+            cardLinks.forEach(link => {
+                const card = link.querySelector('.card');
+
+                link.addEventListener('mouseenter', () => {
+                    card.classList.remove('border-dark');
+                    card.classList.add('border-primary');
+                });
+
+                link.addEventListener('mouseleave', () => {
+                    card.classList.remove('border-primary');
+                    card.classList.add('border-dark');
+                });
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
