@@ -1,5 +1,8 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package it.univaq.lucaepio.webmarket.controller;
-
 import it.univaq.lucaepio.webmarket.model.User;
 import it.univaq.lucaepio.webmarket.service.UserService;
 import freemarker.template.Configuration;
@@ -11,20 +14,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpSession;
 
 /**
- * 
+ *
  * @author lucat
  */
 
-@WebServlet("/registerUsers")
-public class RegisterUsers extends HttpServlet {
+@WebServlet("/editUser")
+public class EditUser extends HttpServlet {
     private UserService userService;
     private Configuration freemarkerConfig;
 
@@ -45,24 +48,35 @@ public class RegisterUsers extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
+
+        String userId = request.getParameter("id");
+        User userToEdit = userService.getUserById(Long.parseLong(userId));
+
         Map<String, Object> data = new HashMap<>();
-        data.put("registerUsers", true);
-        data.put("user", currentUser);
-        processTemplate(response, "registerUsers.ftl.html", data);
+        data.put("user", userToEdit);
+
+        processTemplate(response, "edit_user.ftl.html", data);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String userId = request.getParameter("id");
         String username = request.getParameter("username");
         String email = request.getParameter("email");
-        String password = request.getParameter("password");
         String userType = request.getParameter("userType");
+
+        User user = userService.getUserById(Long.parseLong(userId));
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setUserType(User.UserType.valueOf(userType));
+
+        userService.updateUser(user);
 
         String message;
         try {
-            User user = userService.registerUser(username, email, password, User.UserType.valueOf(userType));
-            message = "Utente " + username + " registrato con successo!";
+            userService.updateUser(user);
+            message = "Utente aggiornato con successo!";
         } catch (Exception e) {
-            message = "Errore durante la registrazione: " + e.getMessage();
+            message = "Errore durante l'aggiornamento dell'utente: " + e.getMessage();
         }
 
         // Reindirizza alla pagina di gestione utenti con il messaggio

@@ -1,0 +1,76 @@
+<#include '/outline.ftl.html'>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Gestione Utenti</h2>
+    
+    <#if message??>
+        <#if message?contains("successo")>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <#else>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </#if>
+    </#if>
+    
+    <a href="/webmarket/registerUsers" class="btn btn-primary mb-3">Aggiungi Nuovo Utente</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Tipo Utente</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            <#list users as user>
+                <tr>
+                    <td>${user.getUserID()}</td>
+                    <td>${user.getUsername()}</td>
+                    <td>${user.getEmail()}</td>
+                    <td>${user.getUserType()}</td>
+                    <td>
+                        <a href="/webmarket/editUser?id=${user.getUserID()}" class="btn btn-sm btn-warning">Modifica</a>
+                        <button class="btn btn-sm btn-danger" onclick="showDeleteConfirmation(${user.getUserID()}, '${user.getUsername()}')">Elimina</button>
+                    </td>
+                </tr>
+            </#list>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal di conferma eliminazione -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler eliminare l'utente <span id="userToDelete"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Elimina</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDeleteConfirmation(userId, username) {
+    document.getElementById('userToDelete').textContent = username;
+    document.getElementById('confirmDeleteButton').href = '/webmarket/deleteUser?id=' + userId;
+    var modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+    modal.show();
+}
+</script>
+
+<#include '/footer.ftl.html'>

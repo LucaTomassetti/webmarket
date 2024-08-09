@@ -1,0 +1,50 @@
+<#include '/outline.ftl.html'>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <#if message??>
+                <#if message?contains("successo")>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <#else>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </#if>
+            </#if>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Modifica Utente</h2>
+                </div>
+                <div class="card-body">
+                    <form action="/webmarket/editUser" method="post">
+                        <input type="hidden" name="id" value="${user.getUserID()}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="${user.getUsername()}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="${user.getEmail()}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userType" class="form-label">Tipo Utente</label>
+                            <select class="form-select" id="userType" name="userType" required>
+                                <option value="Ordinante" <#if user.getUserType() == "Ordinante">selected</#if>>Ordinante</option>
+                                <option value="Tecnico" <#if user.getUserType() == "Tecnico">selected</#if>>Tecnico</option>
+                                <option value="Amministratore" <#if user.getUserType() == "Amministratore">selected</#if>>Amministratore</option>
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<#include '/footer.ftl.html'>
