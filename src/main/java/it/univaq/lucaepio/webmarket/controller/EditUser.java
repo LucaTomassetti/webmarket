@@ -8,6 +8,7 @@ import it.univaq.lucaepio.webmarket.service.UserService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import it.univaq.lucaepio.webmarket.util.Message;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -41,6 +42,7 @@ public class EditUser extends HttpServlet {
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User currentUser = (User) session.getAttribute("user");
@@ -50,43 +52,55 @@ public class EditUser extends HttpServlet {
         }
 
         String userId = request.getParameter("id");
-        User userToEdit = userService.getUserById(Long.parseLong(userId));
-
+        User userToEdit = userService.getUserById(Long.valueOf(userId));
+        
         Map<String, Object> data = new HashMap<>();
-        data.put("user", userToEdit);
+        data.put("user", currentUser);
+        data.put("userToEdit", userToEdit);
+
+        String error = request.getParameter("error");
+        if (error != null) {
+            data.put("message", new Message("danger", error));
+        }
 
         processTemplate(response, "edit_user.ftl.html", data);
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String userId = request.getParameter("id");
-        String username = request.getParameter("username");
-        String email = request.getParameter("email");
-        String userType = request.getParameter("userType");
-
-        User user = userService.getUserById(Long.parseLong(userId));
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setUserType(User.UserType.valueOf(userType));
-
-        userService.updateUser(user);
-
-        String message;
-        try {
-            userService.updateUser(user);
-            message = "Utente aggiornato con successo!";
-        } catch (Exception e) {
-            message = "Errore durante l'aggiornamento dell'utente: " + e.getMessage();
+        HttpSession session = request.getSession(false);
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null || currentUser.getUserType() != User.UserType.Amministratore) {
+            response.sendRedirect("login");
+            return;
         }
 
-        // Reindirizza alla pagina di gestione utenti con il messaggio
-        response.sendRedirect("manageUsers?message=" + URLEncoder.encode(message, StandardCharsets.UTF_8.toString()));
+        String userId = request.getParameter("id");
+        String username = request.getParameter("username");
+        String oldPassword = request.getParameter("oldPassword");
+        String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmPassword");
+
+        if (!newPassword.equals(confirmPassword)) {
+            String errorMessage = URLEncoder.encode("Le nuove password non coincidono! Riprovare", StandardCharsets.UTF_8.toString());
+            response.sendRedirect("editUser?id=" + userId + "&error=" + errorMessage);
+            return;
+        }
+
+        try {
+            User updatedUser = userService.updateUserCredentials(Long.valueOf(userId), username, oldPassword, newPassword, confirmPassword);
+            String successMessage = URLEncoder.encode("Utente " + username + " aggiornato con successo!", StandardCharsets.UTF_8.toString());
+            response.sendRedirect("manageUsers?success=" + successMessage);
+        } catch (IllegalArgumentException e) {
+            String errorMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8.toString());
+            response.sendRedirect("editUser?id=" + userId + "&error=" + errorMessage);
+        }
     }
 
     private void processTemplate(HttpServletResponse response, String templateName, Map<String, Object> data) throws IOException {
-        Template template = freemarkerConfig.getTemplate(templateName);
         response.setContentType("text/html");
         try {
+            Template template = freemarkerConfig.getTemplate(templateName);
             template.process(data, response.getWriter());
         } catch (TemplateException e) {
             throw new IOException("Error processing FreeMarker template", e);

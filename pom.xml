@@ -35,6 +35,12 @@
             <artifactId>hibernate-core</artifactId> 
             <version>6.3.1.Final</version> 
         </dependency>
+        <!-- Utilizzo un pool di connessioni più robusto -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>6.3.1.Final</version>
+        </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>

@@ -8,6 +8,8 @@ import it.univaq.lucaepio.webmarket.service.UserService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import it.univaq.lucaepio.webmarket.util.Message;
+import it.univaq.lucaepio.webmarket.util.PaginationUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,6 +33,7 @@ import java.util.Map;
 public class ManageUsers extends HttpServlet {
     private UserService userService;
     private Configuration freemarkerConfig;
+    private static final int USERS_PER_PAGE = 5;
 
     @Override
     public void init() throws ServletException {
@@ -42,6 +45,7 @@ public class ManageUsers extends HttpServlet {
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User currentUser = (User) session.getAttribute("user");
@@ -50,24 +54,40 @@ public class ManageUsers extends HttpServlet {
             return;
         }
 
-        List<User> users = userService.getAllUsers();
+        int currentPage = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            currentPage = Integer.parseInt(pageParam);
+        }
+
+        long totalUsers = userService.getTotalUsersCount();
+        List<User> usersOnPage = userService.getUsersPage(currentPage, USERS_PER_PAGE);
+        PaginationUtil pagination = new PaginationUtil(USERS_PER_PAGE, currentPage, totalUsers);
+
         Map<String, Object> data = new HashMap<>();
-        data.put("users", users);
+        data.put("users", usersOnPage);
+        data.put("pagination", pagination);
         data.put("user", currentUser);
 
-        // Gestione del messaggio di feedback
-        String message = request.getParameter("message");
-        if (message != null && !message.isEmpty()) {
-            data.put("message", URLDecoder.decode(message, StandardCharsets.UTF_8.toString()));
+        String successParam = request.getParameter("success");
+        if (successParam != null && !successParam.isEmpty()) {
+            String decodedMessage = URLDecoder.decode(successParam, StandardCharsets.UTF_8.toString());
+            data.put("message", new Message("success", decodedMessage));
+        }
+
+        String errorParam = request.getParameter("error");
+        if (errorParam != null && !errorParam.isEmpty()) {
+            String decodedMessage = URLDecoder.decode(errorParam, StandardCharsets.UTF_8.toString());
+            data.put("message", new Message("danger", decodedMessage));
         }
 
         processTemplate(response, "manage_users.ftl.html", data);
     }
 
     private void processTemplate(HttpServletResponse response, String templateName, Map<String, Object> data) throws IOException {
-        Template template = freemarkerConfig.getTemplate(templateName);
         response.setContentType("text/html");
         try {
+            Template template = freemarkerConfig.getTemplate(templateName);
             template.process(data, response.getWriter());
         } catch (TemplateException e) {
             throw new IOException("Error processing FreeMarker template", e);

@@ -31,6 +31,7 @@ public class DeleteUser extends HttpServlet {
         userService = new UserService();
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User currentUser = (User) session.getAttribute("user");
@@ -40,29 +41,21 @@ public class DeleteUser extends HttpServlet {
         }
 
         String userId = request.getParameter("id");
-        String message = "";
+        String message;
 
-        if (userId != null && !userId.isEmpty()) {
-            try {
-                Long id = Long.parseLong(userId);
-                User userToDelete = userService.getUserById(id);
-                if (userToDelete != null) {
-                    userService.deleteUser(id);
-                    message = "Utente " + userToDelete.getUsername() + " eliminato con successo.";
-                } else {
-                    message = "Utente non trovato.";
-                }
-            } catch (NumberFormatException e) {
-                message = "ID utente non valido.";
-            } catch (Exception e) {
-                message = "Si è verificato un errore durante l'eliminazione dell'utente.";
+        try {
+            User userToDelete = userService.getUserById(Long.valueOf(userId));
+            if (userToDelete != null) {
+                userService.deleteUser(Long.valueOf(userId));
+                message = "Utente " + userToDelete.getUsername() + " eliminato con successo.";
+            } else {
+                message = "Utente non trovato.";
             }
-        } else {
-            message = "ID utente mancante.";
+        } catch (Exception e) {
+            message = "Errore durante l'eliminazione dell'utente: " + e.getMessage();
         }
 
-        // Codifica il messaggio per l'uso in un URL
         String encodedMessage = URLEncoder.encode(message, StandardCharsets.UTF_8.toString());
-        response.sendRedirect("manageUsers?message=" + encodedMessage);
+        response.sendRedirect("manageUsers?success=" + encodedMessage);
     }
 }

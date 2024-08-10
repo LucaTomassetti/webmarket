@@ -29,8 +29,8 @@ public class MySQLContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // Chiudi la SessionFactory di Hibernate
-        PersistentManager.getInstance().closeSessionFactory();
+        // Chiudi l'EntityManagerFactory
+        PersistentManager.getInstance().closeEntityManagerFactory();
 
         // Deregistra i driver JDBC
         Enumeration<Driver> drivers = DriverManager.getDrivers();

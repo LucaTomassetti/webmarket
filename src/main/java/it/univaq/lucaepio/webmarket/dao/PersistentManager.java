@@ -1,9 +1,8 @@
 package it.univaq.lucaepio.webmarket.dao;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 /**
  * Gestisce la creazione e la fornitura di SessionFactory e Session di Hibernate. 
  * Implementa il pattern Singleton per garantire un'unica istanza di SessionFactory in tutta l'applicazione.
@@ -41,16 +40,18 @@ import org.hibernate.cfg.Configuration;
     Chiudi la Session.
  * 
  * @author lucat
+ *
  */
+
 public class PersistentManager {
     private static PersistentManager instance;
-    private SessionFactory sessionFactory;
+    private EntityManagerFactory entityManagerFactory;
 
     private PersistentManager() {
         try {
-            sessionFactory = new Configuration().configure().buildSessionFactory();
+            entityManagerFactory = Persistence.createEntityManagerFactory("WebMarketPU");
         } catch (Throwable ex) {
-            System.err.println("Initial SessionFactory creation failed." + ex);
+            System.err.println("Initial EntityManagerFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }
     }
@@ -62,13 +63,13 @@ public class PersistentManager {
         return instance;
     }
 
-    public Session getSession() {
-        return sessionFactory.openSession();
+    public EntityManager getEntityManager() {
+        return entityManagerFactory.createEntityManager();
     }
 
-    public void closeSessionFactory() {
-        if (sessionFactory != null && !sessionFactory.isClosed()) {
-            sessionFactory.close();
+    public void closeEntityManagerFactory() {
+        if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
+            entityManagerFactory.close();
         }
     }
 }

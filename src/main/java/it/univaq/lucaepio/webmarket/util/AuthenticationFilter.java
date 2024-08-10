@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package it.univaq.lucaepio.webmarket.util;
-import it.univaq.lucaepio.webmarket.model.User;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;

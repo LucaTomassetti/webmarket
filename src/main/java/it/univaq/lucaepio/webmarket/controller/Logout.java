@@ -38,6 +38,7 @@ public class Logout extends HttpServlet{
             throw new ServletException("FreeMarker configuration not found in servlet context");
         }
     }
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         session.invalidate();

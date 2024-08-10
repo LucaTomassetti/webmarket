@@ -1,8 +1,8 @@
 package it.univaq.lucaepio.webmarket.dao;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import java.util.List;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  * Implementa l'interfaccia GenericDAO, fornendo l'implementazione concreta delle operazioni CRUD utilizzando Hibernate. 
@@ -12,6 +12,7 @@ import org.hibernate.Transaction;
  * @param <T>
  * @param <ID> 
  */
+
 public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
     protected Class<T> entityClass;
 
@@ -21,58 +22,76 @@ public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
 
     @Override
     public T save(T entity) {
-        try (Session session = PersistentManager.getInstance().getSession()) {
-            Transaction tx = session.beginTransaction();
-            try {
-                session.save(entity);
-                tx.commit();
-                return entity;
-            } catch (Exception e) {
+        EntityManager em = PersistentManager.getInstance().getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.persist(entity);
+            tx.commit();
+            return entity;
+        } catch (Exception e) {
+            if (tx.isActive()) {
                 tx.rollback();
-                throw e;
             }
+            throw e;
+        } finally {
+            em.close();
         }
     }
 
     @Override
     public T findById(ID id) {
-        try (Session session = PersistentManager.getInstance().getSession()) {
-            return session.get(entityClass, id);
+        EntityManager em = PersistentManager.getInstance().getEntityManager();
+        try {
+            return em.find(entityClass, id);
+        } finally {
+            em.close();
         }
     }
 
     @Override
     public List<T> findAll() {
-        try (Session session = PersistentManager.getInstance().getSession()) {
-            return session.createQuery("from " + entityClass.getName(), entityClass).list();
+        EntityManager em = PersistentManager.getInstance().getEntityManager();
+        try {
+            return em.createQuery("from " + entityClass.getName(), entityClass).getResultList();
+        } finally {
+            em.close();
         }
     }
 
     @Override
     public void update(T entity) {
-        try (Session session = PersistentManager.getInstance().getSession()) {
-            Transaction tx = session.beginTransaction();
-            try {
-                session.update(entity);
-                tx.commit();
-            } catch (Exception e) {
+        EntityManager em = PersistentManager.getInstance().getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.merge(entity);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
                 tx.rollback();
-                throw e;
             }
+            throw e;
+        } finally {
+            em.close();
         }
     }
 
     @Override
     public void delete(T entity) {
-        try (Session session = PersistentManager.getInstance().getSession()) {
-            Transaction tx = session.beginTransaction();
-            try {
-                session.delete(entity);
-                tx.commit();
-            } catch (Exception e) {
+        EntityManager em = PersistentManager.getInstance().getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+            em.remove(em.contains(entity) ? entity : em.merge(entity));
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
                 tx.rollback();
-                throw e;
             }
+            throw e;
+        } finally {
+            em.close();
         }
     }
 }

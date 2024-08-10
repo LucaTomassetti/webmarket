@@ -38,6 +38,7 @@ public class Home extends HttpServlet {
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //Controllo se l'utente è autenticato
         HttpSession session = request.getSession(false);

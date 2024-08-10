@@ -5,6 +5,7 @@ import it.univaq.lucaepio.webmarket.service.UserService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import it.univaq.lucaepio.webmarket.util.Message;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -36,29 +37,30 @@ public class Login extends HttpServlet {
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         if(session.getAttribute("user") != null){
             response.sendRedirect("home");
-        }else{
-            
+        } else {
+            processTemplate(response, "login.ftl.html", new HashMap<>());
         }
-        processTemplate(response, "login.ftl.html", new HashMap<>());
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
         User user = userService.authenticateUser(username, password);
 
+        Map<String, Object> data = new HashMap<>();
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             response.sendRedirect("home");
         } else {
-            Map<String, Object> data = new HashMap<>();
-            data.put("error", "Username o password non validi");
+            data.put("message", new Message("danger", "Username o password non validi"));
             processTemplate(response, "login.ftl.html", data);
         }
     }
