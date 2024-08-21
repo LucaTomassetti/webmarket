@@ -6,7 +6,6 @@
     <persistence-unit name="WebMarketPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>it.univaq.lucaepio.webmarket.model.User</class>
-        <class>it.univaq.lucaepio.webmarket.model.User</class>
         <class>it.univaq.lucaepio.webmarket.model.Category</class>
         <class>it.univaq.lucaepio.webmarket.model.ProductCharacteristic</class>
         <class>it.univaq.lucaepio.webmarket.model.PurchaseRequest</class>
