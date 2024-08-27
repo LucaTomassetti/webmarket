@@ -1,0 +1,46 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Modifica Categoria</h2>
+
+    <form action="editCategory" method="post">
+        <input type="hidden" name="categoryId" value="${category.id}">
+        <div class="mb-3">
+            <label for="categoryName" class="form-label">Nome Categoria</label>
+            <input type="text" class="form-control" id="categoryName" name="categoryName" value="${category.name}" required>
+        </div>
+        
+        <div id="subcategoriesContainer">
+            <#list category.subcategories as subcategory>
+                <div class="subcategory-group mb-3">
+                    <h4>Sottocategoria ${subcategory?index + 1}</h4>
+                    <input type="text" class="form-control mb-2" name="subcategoryName[]" value="${subcategory.name}" required>
+                    <input type="text" class="form-control" name="characteristicName[]" value="${subcategory.characteristics?map(c -> c.name)?join(', ')}" required>
+                    <button type="button" class="btn btn-danger btn-sm mt-2" onclick="this.parentElement.remove()">Rimuovi Sottocategoria</button>
+                </div>
+            </#list>
+        </div>
+        
+        <button type="button" class="btn btn-secondary mb-3" onclick="addSubcategory()">Aggiungi Sottocategoria</button>
+        <button type="submit" class="btn btn-primary mb-3">Salva Modifiche</button>
+    </form>
+</div>
+
+<script>
+let subcategoryCount = ${category.subcategories?size};
+
+function addSubcategory() {
+    subcategoryCount++;
+    const container = document.getElementById('subcategoriesContainer');
+    const newSubcategory = document.createElement('div');
+    newSubcategory.className = 'subcategory-group mb-3';
+    newSubcategory.innerHTML = `
+        <h4>Sottocategoria ${subcategoryCount}</h4>
+        <input type="text" class="form-control mb-2" name="subcategoryName[]" placeholder="Nome Sottocategoria" required>
+        <input type="text" class="form-control" name="characteristicName[]" placeholder="Caratteristiche (separate da virgola)" required>
+        <button type="button" class="btn btn-danger btn-sm mt-2" onclick="this.parentElement.remove()">Rimuovi Sottocategoria</button>
+    `;
+    container.appendChild(newSubcategory);
+}
+</script>
+<#include "/footer.ftl.html">

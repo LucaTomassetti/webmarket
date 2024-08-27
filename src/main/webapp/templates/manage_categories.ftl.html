@@ -1,0 +1,85 @@
+<#include "/outline.ftl.html">
+<#import "/pagination.ftl.html" as paginationMacro>
+
+<div class="container mt-5">
+    <h2>Gestione Categorie</h2>
+
+    <#if message??>
+        <div class="alert alert-${message.type} alert-dismissible fade show" role="alert">
+            ${message.content}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </#if>
+
+    <a href="addCategory" class="btn btn-primary mb-3">Aggiungi Nuova Categoria</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome Categoria</th>
+                <th>Sottocategorie</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            <#list categories as category>
+                <tr>
+                    <td>${category.name}</td>
+                    <td>
+                        <#list category.subcategories as subcategory>
+                            <strong>${subcategory.name}:</strong>
+                            <#list subcategory.characteristics as characteristic>
+                                ${characteristic.name}<#if characteristic_has_next>, </#if>
+                            </#list>
+                            <#if subcategory_has_next><br></#if>
+                        </#list>
+                    </td>
+                    <td>
+                        <a href="editCategory?id=${category.id}" class="btn btn-sm btn-warning">Modifica</a>
+                        <button class="btn btn-sm btn-danger delete-category" data-category-id="${category.id}" data-category-name="${category.name}">Elimina</button>
+                    </td>
+                </tr>
+            </#list>
+        </tbody>
+    </table>
+    <@paginationMacro.renderPagination pagination=pagination baseUrl="manageCategories" />
+</div>
+
+<!-- Modal per la conferma di eliminazione -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCategoryModalLabel">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler eliminare la categoria "<span class="category-name-to-delete"></span>"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <a href="#" class="btn btn-danger confirm-delete-button">Elimina</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteCategoryModal'));
+    var deleteButtons = document.querySelectorAll('.delete-category');
+    var categoryNameSpan = document.querySelector('.category-name-to-delete');
+    var confirmDeleteButton = document.querySelector('.confirm-delete-button');
+
+    deleteButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var categoryId = this.getAttribute('data-category-id');
+            var categoryName = this.getAttribute('data-category-name');
+            categoryNameSpan.textContent = categoryName;
+            confirmDeleteButton.href = 'deleteCategory?id=' + categoryId;
+            deleteModal.show();
+        });
+    });
+});
+</script>
+<#include "/footer.ftl.html">

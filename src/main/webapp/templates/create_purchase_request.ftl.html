@@ -1,0 +1,49 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Crea Nuova Richiesta di Acquisto</h2>
+
+    <form id="purchaseRequestForm" action="createPurchaseRequest" method="post">
+        <div class="mb-3">
+            <label for="categorySubcategorySelect" class="form-label">Categoria e Sottocategoria</label>
+            <select class="form-select" id="categorySubcategorySelect" name="subcategoryId" required onchange="this.form.submit()">
+                <option value="">Seleziona una categoria e sottocategoria</option>
+                <#list categories as category>
+                    <optgroup label="${category.name}">
+                        <#list category.subcategories as subcategory>
+                            <option value="${subcategory.id}" <#if selectedSubcategoryId?? && selectedSubcategoryId == subcategory.id>selected</#if>>
+                                ${category.name} > ${subcategory.name}
+                            </option>
+                        </#list>
+                    </optgroup>
+                </#list>
+            </select>
+        </div>
+
+        <#if selectedSubcategory??>
+            <div id="characteristicsContainer">
+                <#list selectedSubcategory.characteristics as characteristic>
+                    <div class="mb-3">
+                        <label for="characteristic_${characteristic.id}" class="form-label">${characteristic.name}</label>
+                        <input type="text" class="form-control" id="characteristic_${characteristic.id}" name="characteristic_${characteristic.id}">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="indifferent_${characteristic.id}" name="indifferent_${characteristic.id}">
+                            <label class="form-check-label" for="indifferent_${characteristic.id}">
+                                Indifferente
+                            </label>
+                        </div>
+                    </div>
+                </#list>
+            </div>
+        </#if>
+
+        <div class="mb-3">
+            <label for="notes" class="form-label">Note aggiuntive</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+        </div>
+
+        <button type="submit" name="action" value="submit" class="btn btn-primary">Invia Richiesta</button>
+    </form>
+</div>
+
+<#include "/footer.ftl.html">

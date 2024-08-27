@@ -5,8 +5,6 @@
 package it.univaq.lucaepio.webmarket.model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -14,18 +12,20 @@ import java.util.List;
  */
 
 @Entity
-@Table(name = "Categories")
-public class Category {
+@Table(name = "Characteristics")
+public class Characteristic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "characteristic_id")
     private Long id;
 
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Subcategory> subcategories = new ArrayList<>();
-
+    @ManyToOne
+    @JoinColumn(name = "subcategory_id")
+    private Subcategory subcategory;
+    
     // Getters and setters
 
     public Long getId() {
@@ -44,21 +44,12 @@ public class Category {
         this.name = name;
     }
 
-    public List<Subcategory> getSubcategories() {
-        return subcategories;
+    public Subcategory getSubcategory() {
+        return subcategory;
     }
 
-    public void setSubcategories(List<Subcategory> subcategories) {
-        this.subcategories = subcategories;
+    public void setSubcategory(Subcategory subcategory) {
+        this.subcategory = subcategory;
     }
     
-    public void addSubcategory(Subcategory subcategory) {
-        subcategories.add(subcategory);
-        subcategory.setCategory(this);
-    }
-
-    public void removeSubcategory(Subcategory subcategory) {
-        subcategories.remove(subcategory);
-        subcategory.setCategory(null);
-    }
 }

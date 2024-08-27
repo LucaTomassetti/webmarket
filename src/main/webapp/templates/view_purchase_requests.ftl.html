@@ -1,0 +1,51 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Le tue Richieste di Acquisto</h2>
+
+    <form action="viewPurchaseRequests" method="get" class="mb-4">
+        <div class="form-group">
+            <label for="statusFilter">Filtra per stato:</label>
+            <select name="status" id="statusFilter" class="form-control" onchange="this.form.submit()">
+                <option value="">Tutti</option>
+                <option value="PENDING" <#if currentStatus?? && currentStatus == "PENDING">selected</#if>>In attesa</option>
+                <option value="IN_PROGRESS" <#if currentStatus?? && currentStatus == "IN_PROGRESS">selected</#if>>In corso</option>
+                <option value="COMPLETED" <#if currentStatus?? && currentStatus == "COMPLETED">selected</#if>>Completata</option>
+                <option value="REJECTED" <#if currentStatus?? && currentStatus == "REJECTED">selected</#if>>Rifiutata</option>
+            </select>
+        </div>
+    </form>
+
+    <#if purchaseRequests?size == 0>
+        <p>Non hai ancora effettuato richieste di acquisto.</p>
+    <#else>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Categoria</th>
+                    <th>Sottocategoria</th>
+                    <th>Stato</th>
+                    <th>Data Creazione</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <#list purchaseRequests as request>
+                    <tr>
+                        <td>${request.id}</td>
+                        <td>${request.getSubcategory().getCategory().getName()}</td>
+                        <td>${request.getSubcategory().getName()}</td>
+                        <td>${request.status}</td>
+                        <td>${request.createdAt}</td>
+                        <td>
+                            <a href="viewPurchaseRequestDetails?id=${request.id}" class="btn btn-sm btn-info">Dettagli</a>
+                        </td>
+                    </tr>
+                </#list>
+            </tbody>
+        </table>
+    </#if>
+</div>
+
+<#include "/footer.ftl.html">
