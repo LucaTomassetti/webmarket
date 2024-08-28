@@ -1,17 +1,19 @@
-<#macro renderPagination pagination baseUrl>
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        <li class="page-item <#if !pagination.hasPreviousPage()>disabled</#if>">
-            <a class="page-link" href="${baseUrl}?page=${pagination.getPreviousPage()}" <#if !pagination.hasPreviousPage()>tabindex="-1" aria-disabled="true"</#if>>Precedente</a>
-        </li>
-        <#list 1..pagination.getTotalPages() as i>
-            <li class="page-item <#if i == pagination.getCurrentPage()>active</#if>">
-                <a class="page-link" href="${baseUrl}?page=${i}">${i}</a>
+<#macro renderPagination pagination baseUrl additionalParams="">
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item <#if !pagination.hasPreviousPage()>disabled</#if>">
+                <a class="page-link" href="${baseUrl}?page=${pagination.getPreviousPage()}${additionalParams}" <#if !pagination.hasPreviousPage()>tabindex="-1" aria-disabled="true"</#if>>Precedente</a>
             </li>
-        </#list>
-        <li class="page-item <#if !pagination.hasNextPage()>disabled</#if>">
-            <a class="page-link" href="${baseUrl}?page=${pagination.getNextPage()}" <#if !pagination.hasNextPage()>tabindex="-1" aria-disabled="true"</#if>>Successiva</a>
-        </li>
-    </ul>
-</nav>
+            
+            <#list 1..pagination.getTotalPages() as i>
+                <li class="page-item <#if i == pagination.getCurrentPage()>active</#if>">
+                    <a class="page-link" href="${baseUrl}?page=${i}${additionalParams}">${i}</a>
+                </li>
+            </#list>
+            
+            <li class="page-item <#if !pagination.hasNextPage()>disabled</#if>">
+                <a class="page-link" href="${baseUrl}?page=${pagination.getNextPage()}${additionalParams}" <#if !pagination.hasNextPage()>tabindex="-1" aria-disabled="true"</#if>>Successiva</a>
+            </li>
+        </ul>
+    </nav>
 </#macro>

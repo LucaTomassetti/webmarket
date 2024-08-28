@@ -1,0 +1,39 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Modifica Richiesta di Acquisto</h2>
+    
+    <form action="editPurchaseRequest" method="post">
+        <input type="hidden" name="id" value="${purchaseRequest.id}">
+        
+        <div class="mb-3">
+            <label class="form-label"><strong>Categoria:</strong> ${purchaseRequest.getSubcategory().getCategory().getName()}</label>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label"><strong>Sottocategoria:</strong> ${purchaseRequest.getSubcategory().getName()}</label>
+        </div>
+        
+        <h5>Caratteristiche:</h5>
+        <#list purchaseRequest.characteristics as requestCharacteristic>
+            <div class="mb-3">
+                <label for="characteristic_${requestCharacteristic.characteristic.id}" class="form-label">${requestCharacteristic.characteristic.name}</label>
+                <input type="text" class="form-control" id="characteristic_${requestCharacteristic.characteristic.id}" name="characteristic_${requestCharacteristic.characteristic.id}" value="${requestCharacteristic.value}">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="indifferent_${requestCharacteristic.characteristic.id}" name="indifferent_${requestCharacteristic.characteristic.id}" <#if requestCharacteristic.value == "indifferente">checked</#if>>
+                    <label class="form-check-label" for="indifferent_${requestCharacteristic.characteristic.id}">Indifferente</label>
+                </div>
+            </div>
+        </#list>
+        
+        <div class="mb-3">
+            <label for="notes" class="form-label">Note:</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3">${purchaseRequest.notes!''}</textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+        <a href="viewPurchaseRequestDetails?id=${purchaseRequest.id}" class="btn btn-secondary">Annulla</a>
+    </form>
+</div>
+
+<#include "/footer.ftl.html">

@@ -5,6 +5,10 @@
             30
         </session-timeout>
     </session-config>
+    <context-param>
+        <param-name>baseUrl</param-name>
+        <param-value>http://localhost:8080/webmarket</param-value>
+    </context-param>
     <welcome-file-list>
         <welcome-file>login</welcome-file>
     </welcome-file-list>

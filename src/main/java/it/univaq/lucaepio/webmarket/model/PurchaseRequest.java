@@ -40,11 +40,19 @@ public class PurchaseRequest {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(nullable = false)
+    private boolean isPriority = false;
+
     public enum Status {
         PENDING, IN_PROGRESS, COMPLETED, REJECTED
     }
 
     // Getters and setters
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        status = Status.PENDING;
+    }
     
     public Long getId() {
         return id;
@@ -102,12 +110,6 @@ public class PurchaseRequest {
         this.status = status;
     }
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        status = Status.PENDING;
-    }
-
     public void addCharacteristic(RequestCharacteristic characteristic) {
         characteristics.add(characteristic);
         characteristic.setPurchaseRequest(this);
@@ -116,5 +118,12 @@ public class PurchaseRequest {
     public void removeCharacteristic(RequestCharacteristic characteristic) {
         characteristics.remove(characteristic);
         characteristic.setPurchaseRequest(null);
+    }
+    public boolean isPriority() {
+        return isPriority;
+    }
+
+    public void setPriority(boolean priority) {
+        isPriority = priority;
     }
 }

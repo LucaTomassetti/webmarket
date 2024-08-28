@@ -1,0 +1,42 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Dettagli Richiesta di Acquisto</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Richiesta #${purchaseRequest.id}</h5>
+            <p class="card-text"><strong>Categoria:</strong> ${purchaseRequest.getSubcategory().getCategory().getName()}</p>
+            <p class="card-text"><strong>Sottocategoria:</strong> ${purchaseRequest.getSubcategory().getName()}</p>
+            <p class="card-text"><strong>Stato:</strong> ${purchaseRequest.status}</p>
+            <p class="card-text"><strong>Data Creazione:</strong> ${purchaseRequest.createdAt}</p>
+            <p class="card-text"><strong>Priorità:</strong> ${purchaseRequest.isPriority()?string('Sì', 'No')}</p>
+            
+            <h6>Caratteristiche:</h6>
+            <#if purchaseRequest.characteristics?? && purchaseRequest.characteristics?size gt 0>
+                <ul>
+                    <#list purchaseRequest.characteristics as requestCharacteristic>
+                        <li><strong>${requestCharacteristic.characteristic.name}:</strong> ${requestCharacteristic.value}</li>
+                    </#list>
+                </ul>
+            <#else>
+                <p>Nessuna caratteristica disponibile</p>
+            </#if>
+            
+            <h6>Note:</h6>
+            <p>${purchaseRequest.notes!''}</p>
+
+            <#if purchaseRequest.status == "PENDING">
+                <a href="editPurchaseRequest?id=${purchaseRequest.id}" class="btn btn-warning">Modifica</a>
+                <form action="deletePurchaseRequest" method="post" style="display: inline;">
+                    <input type="hidden" name="id" value="${purchaseRequest.id}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Sei sicuro di voler eliminare questa richiesta?')">Elimina</button>
+                </form>
+            </#if>
+        </div>
+    </div>
+    
+    <a href="viewPurchaseRequests" class="btn btn-secondary mt-3">Torna alla lista</a>
+</div>
+
+<#include "/footer.ftl.html">

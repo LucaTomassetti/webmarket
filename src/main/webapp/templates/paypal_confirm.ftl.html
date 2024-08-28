@@ -1,0 +1,40 @@
+<#if user??>
+    <#include "/outline.ftl.html">
+<#else>
+    <!DOCTYPE html>
+    <html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Conferma Pagamento</title>
+        <!-- Aggiungi qui i tuoi CSS -->
+    </head>
+    <body>
+</#if>
+
+<div class="container mt-5">
+    <h2>Conferma Ordine PayPal</h2>
+    
+    <div class="alert alert-success" role="alert">
+        Il tuo pagamento è stato elaborato con successo e la tua richiesta di acquisto è stata creata!
+    </div>
+    
+    <h3>Dettagli della richiesta:</h3>
+    <ul>
+        <li><strong>ID Richiesta:</strong> ${purchaseRequest.id}</li>
+        <li><strong>Categoria:</strong> ${purchaseRequest.getSubcategory().getCategory().getName()}</li>
+        <li><strong>Sottocategoria:</strong> ${purchaseRequest.getSubcategory().getName()}</li>
+        <li><strong>Stato:</strong> ${purchaseRequest.status}</li>
+        <li><strong>Data Creazione:</strong> ${purchaseRequest.createdAt}</li>
+        <li><strong>Priorità:</strong> Sì</li>
+    </ul>
+    
+    <a href="viewPurchaseRequests" class="btn btn-primary">Visualizza tutte le richieste</a>
+</div>
+
+<#if !user??>
+    </body>
+    </html>
+<#else>
+    <#include "/footer.ftl.html">
+</#if>

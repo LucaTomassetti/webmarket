@@ -4,13 +4,11 @@
  */
 package it.univaq.lucaepio.webmarket.controller;
 
-import it.univaq.lucaepio.webmarket.model.User;
-import it.univaq.lucaepio.webmarket.model.PurchaseRequest;
-import it.univaq.lucaepio.webmarket.service.PurchaseRequestService;
+import it.univaq.lucaepio.webmarket.model.*;
+import it.univaq.lucaepio.webmarket.service.*;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import it.univaq.lucaepio.webmarket.util.PaginationUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,18 +17,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author lucat
  */
 
-@WebServlet("/viewPurchaseRequests")
-public class ViewPurchaseRequests extends HttpServlet {
+@WebServlet("/viewPurchaseRequestDetails")
+public class ViewPurchaseRequestDetails extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(ViewPurchaseRequestDetails.class.getName());
     private PurchaseRequestService purchaseRequestService;
     private Configuration freemarkerConfig;
-    private static final int REQUESTS_PER_PAGE = 5;
 
     @Override
     public void init() throws ServletException {
@@ -48,34 +49,28 @@ public class ViewPurchaseRequests extends HttpServlet {
             return;
         }
 
-        String statusFilter = request.getParameter("status");
-        int currentPage = 1;
-        String pageParam = request.getParameter("page");
-        if (pageParam != null && !pageParam.isEmpty()) {
-            currentPage = Integer.parseInt(pageParam);
+        String requestId = request.getParameter("id");
+        if (requestId == null || requestId.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing request ID");
+            return;
         }
 
-        List<PurchaseRequest> purchaseRequests;
-        long totalRequests;
+        try {
+            PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestById(Long.parseLong(requestId));
+            if (purchaseRequest == null || !purchaseRequest.getOrderer().getUserID().equals(currentUser.getUserID())) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Purchase request not found");
+                return;
+            }
 
-        if (statusFilter != null && !statusFilter.isEmpty()) {
-            PurchaseRequest.Status status = PurchaseRequest.Status.valueOf(statusFilter.toUpperCase());
-            purchaseRequests = purchaseRequestService.getPurchaseRequestsByUserAndStatusPaginated(currentUser, status, currentPage, REQUESTS_PER_PAGE);
-            totalRequests = purchaseRequestService.getTotalPurchaseRequestsCountByUserAndStatus(currentUser, status);
-        } else {
-            purchaseRequests = purchaseRequestService.getPurchaseRequestsByUserPaginated(currentUser, currentPage, REQUESTS_PER_PAGE);
-            totalRequests = purchaseRequestService.getTotalPurchaseRequestsCountByUser(currentUser);
+            Map<String, Object> data = new HashMap<>();
+            data.put("user", currentUser);
+            data.put("purchaseRequest", purchaseRequest);
+
+            processTemplate(response, "purchase_request_details.ftl.html", data);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error processing purchase request details", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
         }
-
-        PaginationUtil pagination = new PaginationUtil(REQUESTS_PER_PAGE, currentPage, totalRequests);
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("user", currentUser);
-        data.put("purchaseRequests", purchaseRequests);
-        data.put("currentStatus", statusFilter != null ? statusFilter.toUpperCase() : "");
-        data.put("pagination", pagination);
-
-        processTemplate(response, "view_purchase_requests.ftl.html", data);
     }
 
     private void processTemplate(HttpServletResponse response, String templateName, Map<String, Object> data) throws IOException {
@@ -84,6 +79,7 @@ public class ViewPurchaseRequests extends HttpServlet {
             Template template = freemarkerConfig.getTemplate(templateName);
             template.process(data, response.getWriter());
         } catch (TemplateException e) {
+            LOGGER.log(Level.SEVERE, "Error processing template", e);
             throw new IOException("Error processing FreeMarker template", e);
         }
     }
