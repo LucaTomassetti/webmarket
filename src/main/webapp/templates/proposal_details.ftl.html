@@ -1,0 +1,33 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Dettagli Proposta</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Proposta #${proposal.id}</h5>
+            <p><strong>Produttore:</strong> ${proposal.manufacturerName}</p>
+            <p><strong>Prodotto:</strong> ${proposal.productName}</p>
+            <p><strong>Codice Prodotto:</strong> ${proposal.productCode}</p>
+            <p><strong>Prezzo:</strong> &euro;${proposal.price?string(",##0.00")}</p>
+            <p><strong>URL:</strong> <a href="${proposal.url}" target="_blank">${proposal.url}</a></p>
+            <p><strong>Stato:</strong> ${proposal.status}</p>
+            <p><strong>Data Creazione:</strong> ${proposal.createdAt}</p>
+            <p><strong>Note:</strong> ${proposal.notes!''}</p>
+
+            <#if proposal.status == "REJECTED">
+                <p><strong>Motivazione del rifiuto:</strong> ${proposal.rejectionReason!''}</p>
+            </#if>
+
+            <h6>Dettagli Richiesta Originale:</h6>
+            <p><strong>ID Richiesta:</strong> ${proposal.purchaseRequest.id}</p>
+            <p><strong>Categoria:</strong> ${proposal.purchaseRequest.getSubcategory().getCategory().getName()}</p>
+            <p><strong>Sottocategoria:</strong> ${proposal.purchaseRequest.getSubcategory().getName()}</p>
+            <p><strong>Priorità:</strong> ${proposal.purchaseRequest.isPriority()?string('Sì', 'No')}</p>
+        </div>
+    </div>
+
+    <a href="purchaseProposals?action=viewProposals" class="btn btn-secondary mt-3">Torna alla lista</a>
+</div>
+
+<#include "/footer.ftl.html">

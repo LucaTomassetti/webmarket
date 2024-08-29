@@ -1,0 +1,44 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Proposte Esistenti per la Richiesta #${purchaseRequest.id}</h2>
+
+    <#if existingProposals?? && existingProposals?size gt 0>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Produttore</th>
+                    <th>Prodotto</th>
+                    <th>Prezzo</th>
+                    <th>Stato</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <#list existingProposals as proposal>
+                    <tr>
+                        <td>${proposal.id}</td>
+                        <td>${proposal.manufacturerName}</td>
+                        <td>${proposal.productName}</td>
+                        <td>&euro;${proposal.price}</td>
+                        <td>${proposal.status}</td>
+                        <td>
+                            <a href="purchaseProposals?action=viewDetails&id=${proposal.id}" class="btn btn-info btn-sm">Dettagli</a>
+                        </td>
+                    </tr>
+                </#list>
+            </tbody>
+        </table>
+    <#else>
+        <p>Non ci sono proposte esistenti per questa richiesta.</p>
+    </#if>
+
+    <#if canCreateNewProposal && user.getUserType() == "Tecnico">
+        <a href="purchaseProposals?action=createProposalForm&requestId=${purchaseRequest.id}" class="btn btn-primary mt-3">Crea Nuova Proposta</a>
+    </#if>
+
+    <a href="technicianRequests?action=viewAssigned" class="btn btn-secondary mt-3">Torna alle Richieste</a>
+</div>
+
+<#include "/footer.ftl.html">

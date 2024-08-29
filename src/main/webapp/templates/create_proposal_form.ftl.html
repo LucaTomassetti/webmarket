@@ -1,0 +1,47 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Crea Nuova Proposta</h2>
+    <h3>Per la Richiesta #${purchaseRequest.id}</h3>
+
+    <form action="purchaseProposals" method="post">
+        <input type="hidden" name="action" value="createProposal">
+        <input type="hidden" name="requestId" value="${purchaseRequest.id}">
+
+        <div class="mb-3">
+            <label for="manufacturerName" class="form-label">Nome Produttore</label>
+            <input type="text" class="form-control" id="manufacturerName" name="manufacturerName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="productName" class="form-label">Nome Prodotto</label>
+            <input type="text" class="form-control" id="productName" name="productName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="productCode" class="form-label">Codice Prodotto</label>
+            <input type="text" class="form-control" id="productCode" name="productCode" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="price" class="form-label">Prezzo</label>
+            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="url" class="form-label">URL</label>
+            <input type="url" class="form-control" id="url" name="url" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="notes" class="form-label">Note</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Invia Proposta</button>
+    </form>
+
+    <a href="purchaseProposals?action=viewExistingProposals&requestId=${purchaseRequest.id}" class="btn btn-secondary mt-3">Torna alle Proposte</a>
+</div>
+
+<#include "/footer.ftl.html">

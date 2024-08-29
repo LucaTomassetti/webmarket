@@ -39,12 +39,22 @@ public class PurchaseRequest {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+    
+    @Column(columnDefinition = "TEXT")
+    private String rejectionReason;
 
     @Column(nullable = false)
     private boolean isPriority = false;
+    
+    @ManyToOne
+    @JoinColumn(name = "assigned_technician_id")
+    private User assignedTechnician;
+
+    @OneToMany(mappedBy = "purchaseRequest")
+    private List<PurchaseProposal> purchaseProposals;
 
     public enum Status {
-        PENDING, IN_PROGRESS, COMPLETED, REJECTED
+        PENDING, IN_PROGRESS, COMPLETED, REJECTED_NOT_CONFORMING, REJECTED_NOT_WORKING
     }
 
     // Getters and setters
@@ -125,5 +135,27 @@ public class PurchaseRequest {
 
     public void setPriority(boolean priority) {
         isPriority = priority;
+    }
+    public User getAssignedTechnician() {
+        return assignedTechnician;
+    }
+
+    public void setAssignedTechnician(User assignedTechnician) {
+        this.assignedTechnician = assignedTechnician;
+    }
+
+    public List<PurchaseProposal> getPurchaseProposals() {
+        return purchaseProposals;
+    }
+
+    public void setPurchaseProposals(List<PurchaseProposal> purchaseProposals) {
+        this.purchaseProposals = purchaseProposals;
+    }
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
     }
 }

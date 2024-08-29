@@ -12,7 +12,8 @@
                 <option value="PENDING" <#if currentStatus == "PENDING">selected</#if>>In attesa</option>
                 <option value="IN_PROGRESS" <#if currentStatus == "IN_PROGRESS">selected</#if>>In corso</option>
                 <option value="COMPLETED" <#if currentStatus == "COMPLETED">selected</#if>>Completata</option>
-                <option value="REJECTED" <#if currentStatus == "REJECTED">selected</#if>>Rifiutata</option>
+                <option value="REJECTED_NOT_CONFORMING" <#if currentStatus == "REJECTED_NOT_CONFORMING">selected</#if>>Rifiutata non conforme</option>
+                <option value="REJECTED_NOT_WORKING" <#if currentStatus == "REJECTED_NOT_WORKING">selected</#if>>Rifiutata non funzionante</option>
             </select>
         </div>
     </form>
@@ -34,7 +35,7 @@
             </thead>
             <tbody>
                 <#list purchaseRequests as request>
-                    <tr>
+                    <tr <#if request.status == "IN_PROGRESS">class="row-inprogress"</#if>>
                         <td>${request.id}</td>
                         <td>${request.getSubcategory().getCategory().getName()}</td>
                         <td>${request.getSubcategory().getName()}</td>

@@ -19,70 +19,50 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author lucat
  */
 
-@WebServlet("/viewPurchaseRequestDetails")
-public class ViewPurchaseRequestDetails extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(ViewPurchaseRequestDetails.class.getName());
+@WebServlet("/createProposalForm")
+public class CreateProposal extends HttpServlet {
     private PurchaseRequestService purchaseRequestService;
-    private PurchaseProposalService purchaseProposalService;
     private Configuration freemarkerConfig;
 
     @Override
     public void init() throws ServletException {
         super.init();
         purchaseRequestService = new PurchaseRequestService();
-        purchaseProposalService = new PurchaseProposalService();
         freemarkerConfig = (Configuration) getServletContext().getAttribute("freemarker_config");
     }
 
-     @Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
+        if (currentUser == null || currentUser.getUserType() != User.UserType.Tecnico) {
             response.sendRedirect("login");
             return;
         }
 
-        String requestId = request.getParameter("id");
+        String requestId = request.getParameter("requestId");
         if (requestId == null || requestId.isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing request ID");
             return;
         }
 
-        try {
-            PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestById(Long.parseLong(requestId));
-            if (purchaseRequest == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Purchase request not found");
-                return;
-            }
-
-            // Check if the user is authorized to view this request
-            if (currentUser.getUserType() == User.UserType.Ordinante && !purchaseRequest.getOrderer().getUserID().equals(currentUser.getUserID())) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to view this request");
-                return;
-            }
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("user", currentUser);
-            data.put("purchaseRequest", purchaseRequest);
-
-            // Check if there's an accepted proposal
-            boolean hasAcceptedProposal = purchaseProposalService.hasAcceptedProposal(purchaseRequest.getId());
-            data.put("hasAcceptedProposal", hasAcceptedProposal);
-
-            processTemplate(response, "purchase_request_details.ftl.html", data);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error processing purchase request details", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
+        PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestById(Long.parseLong(requestId));
+        if (purchaseRequest == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Purchase request not found");
+            return;
         }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("user", currentUser);
+        data.put("purchaseRequest", purchaseRequest);
+
+        processTemplate(response, "create_proposal_form.ftl.html", data);
     }
 
     private void processTemplate(HttpServletResponse response, String templateName, Map<String, Object> data) throws IOException {
@@ -91,7 +71,6 @@ public class ViewPurchaseRequestDetails extends HttpServlet {
             Template template = freemarkerConfig.getTemplate(templateName);
             template.process(data, response.getWriter());
         } catch (TemplateException e) {
-            LOGGER.log(Level.SEVERE, "Error processing template", e);
             throw new IOException("Error processing FreeMarker template", e);
         }
     }

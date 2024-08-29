@@ -1,0 +1,64 @@
+<#include "/outline.ftl.html">
+<#import "/pagination.ftl.html" as paginationMacro>
+
+<div class="container mt-5">
+    <h2>Richieste di Acquisto</h2>
+
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link ${(currentAction == 'viewPending')?string('active', '')}" href="technicianRequests?action=viewPending">Richieste in attesa</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link ${(currentAction == 'viewAssigned')?string('active', '')}" href="technicianRequests?action=viewAssigned">Richieste prese in carico</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link ${(currentAction == 'viewHistory')?string('active', '')}" href="technicianRequests?action=viewHistory">Storico</a>
+        </li>
+    </ul>
+
+    <#if requests?size == 0>
+        <p>Nessuna richiesta disponibile.</p>
+    <#else>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Categoria</th>
+                    <th>Sottocategoria</th>
+                    <th>Stato</th>
+                    <th>Data Creazione</th>
+                    <th>Priorità</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <#list requests as request>
+                    <tr <#if request.status == "COMPLETED">class="row-completed"<#elseif request.status == "REJECTED_NOT_CONFORMING" || request.status == "REJECTED_NOT_WORKING">class="row-rejected"</#if>>
+                        <td>${request.id}</td>
+                        <td>${request.getSubcategory().getCategory().getName()}</td>
+                        <td>${request.getSubcategory().getName()}</td>
+                        <td>${request.status}</td>
+                        <td>${request.createdAt}</td>
+                        <td>${request.isPriority()?string('Sì', 'No')}</td>
+                        <td>
+                            <a href="viewPurchaseRequestDetails?id=${request.id}" class="btn btn-info btn-sm">Dettagli</a>
+                            <#if currentAction == 'viewPending'>
+                                <form action="technicianRequests" method="post" style="display: inline;">
+                                    <input type="hidden" name="action" value="assignRequest">
+                                    <input type="hidden" name="requestId" value="${request.id}">
+                                    <button type="submit" class="btn btn-primary btn-sm">Prendi in Carico</button>
+                                </form>
+                            <#elseif currentAction == 'viewAssigned'>
+                                <a href="purchaseProposals?action=viewExistingProposals&requestId=${request.id}" class="btn btn-success btn-sm">Crea Proposta</a>
+                            </#if>
+                        </td>
+                    </tr>
+                </#list>
+            </tbody>
+        </table>
+
+        <@paginationMacro.renderPagination pagination=pagination baseUrl="technicianRequests" additionalParams="&action=${currentAction}" />
+    </#if>
+</div>
+
+<#include "/footer.ftl.html">

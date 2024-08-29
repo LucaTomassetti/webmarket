@@ -1,0 +1,118 @@
+<#include "/outline.ftl.html">
+<#import "/pagination.ftl.html" as paginationMacro>
+
+<div class="container mt-5">
+    <h2>Proposte di Acquisto per le tue Richieste</h2>
+
+    <#if proposals?? && proposals?size gt 0>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Richiesta ID</th>
+                    <th>Produttore</th>
+                    <th>Prodotto</th>
+                    <th>Prezzo</th>
+                    <th>Stato</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <#list proposals as proposal>
+                    <tr>
+                        <td>${proposal.id}</td>
+                        <td>${proposal.purchaseRequest.id}</td>
+                        <td>${proposal.manufacturerName}</td>
+                        <td>${proposal.productName}</td>
+                        <td>&euro;${proposal.price}</td>
+                        <td>${proposal.status}</td>
+                        <td>
+                            <a href="purchaseProposals?action=viewDetails&id=${proposal.id}" class="btn btn-info btn-sm">Dettagli</a>
+                            <#if proposal.status == "PENDING">
+                                <button class="btn btn-success btn-sm" onclick="acceptProposal(${proposal.id})">Accetta</button>
+                                <button class="btn btn-danger btn-sm" onclick="showRejectModal(${proposal.id})">Rifiuta</button>
+                            </#if>
+                        </td>
+                    </tr>
+                </#list>
+            </tbody>
+        </table>
+        <@paginationMacro.renderPagination pagination=pagination baseUrl="purchaseProposals?action=viewProposals" />
+    <#else>
+        <p>Non ci sono proposte di acquisto per le tue richieste.</p>
+    </#if>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Rifiuta Proposta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm">
+                    <input type="hidden" id="proposalId" name="proposalId">
+                    <div class="mb-3">
+                        <label for="rejectionReason" class="form-label">Motivazione del rifiuto:</label>
+                        <textarea class="form-control" id="rejectionReason" name="rejectionReason" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" onclick="rejectProposal()">Conferma Rifiuto</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showRejectModal(proposalId) {
+    document.getElementById('proposalId').value = proposalId;
+    var modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+    modal.show();
+}
+
+function rejectProposal() {
+    var proposalId = document.getElementById('proposalId').value;
+    var rejectionReason = document.getElementById('rejectionReason').value;
+    if (rejectionReason.trim() === '') {
+        alert('Per favore, inserisci una motivazione per il rifiuto.');
+        return;
+    }
+    fetch('purchaseProposals', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=updateProposalStatus&proposalId=' + proposalId + '&newStatus=REJECTED&rejectionReason=' + encodeURIComponent(rejectionReason)
+    }).then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Si è verificato un errore durante il rifiuto della proposta.');
+        }
+    });
+}
+
+function acceptProposal(proposalId) {
+    if (confirm('Sei sicuro di voler accettare questa proposta?')) {
+        fetch('purchaseProposals', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=updateProposalStatus&proposalId=' + proposalId + '&newStatus=ACCEPTED'
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Si è verificato un errore durante l\'accettazione della proposta.');
+            }
+        });
+    }
+}
+</script>
+
+<#include "/footer.ftl.html">

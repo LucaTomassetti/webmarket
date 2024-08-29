@@ -1,0 +1,52 @@
+<#include "/outline.ftl.html">
+
+<div class="container mt-5">
+    <h2>Chiudi Richiesta di Acquisto</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Richiesta #${purchaseRequest.id}</h5>
+            <p><strong>Categoria:</strong> ${purchaseRequest.getSubcategory().getCategory().getName()}</p>
+            <p><strong>Sottocategoria:</strong> ${purchaseRequest.getSubcategory().getName()}</p>
+            <p><strong>Stato attuale:</strong> ${purchaseRequest.status}</p>
+
+            <form action="closePurchaseRequest" method="post">
+                <input type="hidden" name="id" value="${purchaseRequest.id}">
+                
+                <div class="form-group">
+                    <label>Azione:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="action" id="accept" value="accept" required>
+                        <label class="form-check-label" for="accept">Accetta il prodotto</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="action" id="reject_not_conforming" value="reject_not_conforming">
+                        <label class="form-check-label" for="reject_not_conforming">Rifiuta - Non conforme</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="action" id="reject_not_working" value="reject_not_working">
+                        <label class="form-check-label" for="reject_not_working">Rifiuta - Non funzionante</label>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3" id="rejectionReasonGroup" style="display: none;">
+                    <label for="rejectionReason">Motivo del rifiuto:</label>
+                    <textarea class="form-control" id="rejectionReason" name="rejectionReason" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Conferma</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('input[name="action"]').forEach((elem) => {
+        elem.addEventListener("change", function(event) {
+            var rejectionReasonGroup = document.getElementById("rejectionReasonGroup");
+            rejectionReasonGroup.style.display = event.target.value.includes("reject") ? "block" : "none";
+        });
+    });
+</script>
+
+<#include "/footer.ftl.html">

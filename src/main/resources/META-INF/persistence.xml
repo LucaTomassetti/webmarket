@@ -6,12 +6,9 @@
     <class>it.univaq.lucaepio.webmarket.model.Category</class>
     <class>it.univaq.lucaepio.webmarket.model.Subcategory</class>
     <class>it.univaq.lucaepio.webmarket.model.Characteristic</class>
-    <class>it.univaq.lucaepio.webmarket.model.ProductCharacteristic</class>
     <class>it.univaq.lucaepio.webmarket.model.PurchaseRequest</class>
     <class>it.univaq.lucaepio.webmarket.model.RequestCharacteristic</class>
     <class>it.univaq.lucaepio.webmarket.model.PurchaseProposal</class>
-    <class>it.univaq.lucaepio.webmarket.model.OrderStatus</class>
-    <class>it.univaq.lucaepio.webmarket.model.Payment</class>
     <properties>
       <!-- Configurazioni della connessione al database 
              Queste proprietà specificano come Hibernate si connette al database -->

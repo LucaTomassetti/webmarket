@@ -1,0 +1,42 @@
+<#include "/outline.ftl.html">
+<#import "/pagination.ftl.html" as paginationMacro>
+
+<div class="container mt-5">
+    <h2>Le tue Proposte di Acquisto</h2>
+
+    <#if proposals?? && proposals?size gt 0>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Richiesta ID</th>
+                    <th>Produttore</th>
+                    <th>Prodotto</th>
+                    <th>Prezzo</th>
+                    <th>Stato</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <#list proposals as proposal>
+                    <tr>
+                        <td>${proposal.id}</td>
+                        <td>${proposal.purchaseRequest.id}</td>
+                        <td>${proposal.manufacturerName}</td>
+                        <td>${proposal.productName}</td>
+                        <td>&euro;${proposal.price}</td>
+                        <td>${proposal.status}</td>
+                        <td>
+                            <a href="purchaseProposals?action=viewDetails&id=${proposal.id}" class="btn btn-info btn-sm">Dettagli</a>
+                        </td>
+                    </tr>
+                </#list>
+            </tbody>
+        </table>
+        <@paginationMacro.renderPagination pagination=pagination baseUrl="purchaseProposals?action=viewProposals" />
+    <#else>
+        <p>Non hai ancora fatto proposte di acquisto.</p>
+    </#if>
+</div>
+
+<#include "/footer.ftl.html">

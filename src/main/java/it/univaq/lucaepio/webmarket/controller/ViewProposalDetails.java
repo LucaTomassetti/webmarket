@@ -4,8 +4,9 @@
  */
 package it.univaq.lucaepio.webmarket.controller;
 
-import it.univaq.lucaepio.webmarket.model.*;
-import it.univaq.lucaepio.webmarket.service.*;
+import it.univaq.lucaepio.webmarket.model.PurchaseProposal;
+import it.univaq.lucaepio.webmarket.model.User;
+import it.univaq.lucaepio.webmarket.service.PurchaseProposalService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -27,22 +28,20 @@ import java.util.logging.Logger;
  * @author lucat
  */
 
-@WebServlet("/viewPurchaseRequestDetails")
-public class ViewPurchaseRequestDetails extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(ViewPurchaseRequestDetails.class.getName());
-    private PurchaseRequestService purchaseRequestService;
+@WebServlet("/viewProposalDetails")
+public class ViewProposalDetails extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(ViewProposalDetails.class.getName());
     private PurchaseProposalService purchaseProposalService;
     private Configuration freemarkerConfig;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        purchaseRequestService = new PurchaseRequestService();
         purchaseProposalService = new PurchaseProposalService();
         freemarkerConfig = (Configuration) getServletContext().getAttribute("freemarker_config");
     }
 
-     @Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         User currentUser = (User) session.getAttribute("user");
@@ -51,36 +50,37 @@ public class ViewPurchaseRequestDetails extends HttpServlet {
             return;
         }
 
-        String requestId = request.getParameter("id");
-        if (requestId == null || requestId.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing request ID");
+        String proposalId = request.getParameter("id");
+        if (proposalId == null || proposalId.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing proposal ID");
             return;
         }
 
         try {
-            PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestById(Long.parseLong(requestId));
-            if (purchaseRequest == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Purchase request not found");
+            PurchaseProposal proposal = purchaseProposalService.getProposalById(Long.parseLong(proposalId));
+            if (proposal == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Proposal not found");
                 return;
             }
 
-            // Check if the user is authorized to view this request
-            if (currentUser.getUserType() == User.UserType.Ordinante && !purchaseRequest.getOrderer().getUserID().equals(currentUser.getUserID())) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to view this request");
+            // Verifica che l'utente sia autorizzato a visualizzare questa proposta
+            if (currentUser.getUserType() == User.UserType.Ordinante && !proposal.getPurchaseRequest().getOrderer().getUserID().equals(currentUser.getUserID())) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to view this proposal");
+                return;
+            }
+
+            if (currentUser.getUserType() == User.UserType.Tecnico && !proposal.getTechnician().getUserID().equals(currentUser.getUserID())) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to view this proposal");
                 return;
             }
 
             Map<String, Object> data = new HashMap<>();
             data.put("user", currentUser);
-            data.put("purchaseRequest", purchaseRequest);
+            data.put("proposal", proposal);
 
-            // Check if there's an accepted proposal
-            boolean hasAcceptedProposal = purchaseProposalService.hasAcceptedProposal(purchaseRequest.getId());
-            data.put("hasAcceptedProposal", hasAcceptedProposal);
-
-            processTemplate(response, "purchase_request_details.ftl.html", data);
+            processTemplate(response, "proposal_details.ftl.html", data);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error processing purchase request details", e);
+            LOGGER.log(Level.SEVERE, "Error processing proposal details", e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing your request");
         }
     }

@@ -15,3 +15,13 @@
 .card {
     transition: border-color 0.5s ease;
 }
+.row-inprogress {
+  background-color: #4dd66a;
+}
+
+.row-completed {
+  background-color: #7FC771;
+}
+.row-rejected {
+  background-color: #F37161;
+}

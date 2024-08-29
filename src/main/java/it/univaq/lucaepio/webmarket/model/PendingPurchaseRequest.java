@@ -26,25 +26,10 @@ public class PendingPurchaseRequest {
         this.isPriority = isPriority;
     }
 
-    // Getters and setters
-
-    public User getOrderer() {
-        return orderer;
-    }
-
-    public Subcategory getSubcategory() {
-        return subcategory;
-    }
-
-    public List<RequestCharacteristic> getCharacteristics() {
-        return characteristics;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public boolean isPriority() {
-        return isPriority;
-    }
+    // Getters
+    public User getOrderer() { return orderer; }
+    public Subcategory getSubcategory() { return subcategory; }
+    public List<RequestCharacteristic> getCharacteristics() { return characteristics; }
+    public String getNotes() { return notes; }
+    public boolean isPriority() { return isPriority; }
 }
