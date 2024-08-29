@@ -26,3 +26,4 @@ target/
 src/test/
 *.bak
 src/main/resources/paypal.properties
+src/main/resources/email.properties

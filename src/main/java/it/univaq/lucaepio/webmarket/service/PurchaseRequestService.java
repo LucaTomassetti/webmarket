@@ -20,6 +20,11 @@ import java.util.logging.Logger;
  */
 public class PurchaseRequestService {
     private static final Logger LOGGER = Logger.getLogger(PurchaseRequestService.class.getName());
+    private EmailService emailService;
+    
+    public PurchaseRequestService() {
+        this.emailService = new EmailService();
+    }
 
     public PurchaseRequest createPurchaseRequest(User orderer, Subcategory subcategory, List<RequestCharacteristic> characteristics, String notes, boolean isPriority) {
         EntityManager em = PersistentManager.getInstance().getEntityManager();
@@ -38,6 +43,10 @@ public class PurchaseRequestService {
             
             em.persist(request);
             tx.commit();
+            // Invia email di notifica
+            String subject = "Nuova richiesta di acquisto creata";
+            String body = "È stata creata una nuova richiesta di acquisto con ID: " + request.getId();
+            emailService.sendEmail(orderer.getEmail(), subject, body);
             return request;
         } catch (Exception e) {
             if (tx.isActive()) {
@@ -233,6 +242,10 @@ public class PurchaseRequestService {
                 em.merge(request);
             }
             tx.commit();
+            // Invia email di notifica al tecnico
+            String subject = "Nuova richiesta di acquisto assegnata";
+            String body = "Ti è stata assegnata una nuova richiesta di acquisto con ID: " + requestId;
+            emailService.sendEmail(technician.getEmail(), subject, body);
         } catch (Exception e) {
             if (tx.isActive()) {
                 tx.rollback();
@@ -310,6 +323,11 @@ public class PurchaseRequestService {
                 em.merge(request);
             }
             tx.commit();
+            // Invia email di notifica all'ordinante e al tecnico
+            String subject = "Richiesta di acquisto chiusa";
+            String body = "La richiesta di acquisto con ID: " + requestId + " è stata chiusa con stato: " + finalStatus;
+            emailService.sendEmail(request.getOrderer().getEmail(), subject, body);
+            emailService.sendEmail(request.getAssignedTechnician().getEmail(), subject, body);
         } catch (Exception e) {
             if (tx.isActive()) {
                 tx.rollback();

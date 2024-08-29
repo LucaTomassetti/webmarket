@@ -58,6 +58,12 @@
             <artifactId>checkout-sdk</artifactId>
             <version>2.0.0</version>
         </dependency>
+        <!-- Mail -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
         <!-- nota: importare direttamente la piattaforma JavaEE 8 
             non è teoricamente corretto perchè Tomcat non la implementa completamente
         
