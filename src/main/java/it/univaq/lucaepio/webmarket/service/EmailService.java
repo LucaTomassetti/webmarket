@@ -25,6 +25,9 @@ public class EmailService {
 
     public EmailService() {
         prop = new Properties();
+        // Abilita il debug
+        prop.put("mail.debug", "true");
+        prop.put("mail.debug.auth", "true");
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("email.properties")) {
             if (input == null) {
                 LOGGER.severe("Unable to find email.properties");
@@ -53,6 +56,10 @@ public class EmailService {
                 return new PasswordAuthentication(username, password);
             }
         });
+
+        // Imposta l'output del debug su System.out
+        session.setDebug(true);
+        session.setDebugOut(System.out);
 
         try {
             Message message = new MimeMessage(session);

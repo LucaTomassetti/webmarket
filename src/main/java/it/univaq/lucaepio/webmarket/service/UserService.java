@@ -235,4 +235,15 @@ public class UserService {
             em.close();
         }
     }
+    public List<User> getAllTechnicians() {
+        EntityManager em = PersistentManager.getInstance().getEntityManager();
+        try {
+            TypedQuery<User> query = em.createQuery(
+                "SELECT u FROM User u WHERE u.userType = :userType", User.class);
+            query.setParameter("userType", User.UserType.Tecnico);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }

@@ -23,6 +23,11 @@ import java.util.logging.Logger;
 
 public class PurchaseProposalService {
     private static final Logger LOGGER = Logger.getLogger(PurchaseProposalService.class.getName());
+    private EmailService emailService;
+
+    public PurchaseProposalService() {
+        this.emailService = new EmailService();
+    }
 
     public PurchaseProposal createProposal(PurchaseRequest purchaseRequest, User technician, String manufacturerName, String productName, String productCode, Double price, String url, String notes) {
         EntityManager em = PersistentManager.getInstance().getEntityManager();
@@ -42,7 +47,10 @@ public class PurchaseProposalService {
             
             em.persist(proposal);
             tx.commit();
-            
+            // Invia email all'ordinante
+            String subject = "Nuova proposta per la tua richiesta di acquisto";
+            String body = "È stata creata una nuova proposta per la tua richiesta di acquisto con ID: " + purchaseRequest.getId();
+            emailService.sendEmail(purchaseRequest.getOrderer().getEmail(), subject, body);
             return proposal;
         } catch (Exception e) {
             if (tx.isActive()) {
@@ -142,6 +150,13 @@ public class PurchaseProposalService {
                 em.merge(proposal);
             }
             tx.commit();
+            //Invio mail
+            String subject = "Aggiornamento stato proposta";
+            String body = "La proposta con ID: " + proposalId + " è stata " + (newStatus == PurchaseProposal.Status.ACCEPTED ? "accettata" : "rifiutata");
+            if (newStatus == PurchaseProposal.Status.REJECTED && rejectionReason != null && !rejectionReason.isEmpty()) {
+                body += "\nMotivo del rifiuto: " + rejectionReason;
+            }
+            emailService.sendEmail(proposal.getTechnician().getEmail(), subject, body);
         } catch (Exception e) {
             if (tx.isActive()) {
                 tx.rollback();
