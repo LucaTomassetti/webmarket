@@ -32,7 +32,9 @@
                     <td>${user.getUserType()}</td>
                     <td>
                         <a href="editUser?id=${user.getUserID()}" class="btn btn-sm btn-warning">Modifica</a>
-                        <button class="btn btn-sm btn-danger" onclick="showDeleteConfirmation(${user.getUserID()}, '${user.getUsername()}')">Elimina</button>
+                        <#if user.getUserType() != 'Amministratore'>
+                            <button class="btn btn-sm btn-danger" onclick="showDeleteConfirmation(${user.getUserID()}, '${user.getUsername()}')">Elimina</button>
+                        </#if>
                     </td>
                 </tr>
             </#list>

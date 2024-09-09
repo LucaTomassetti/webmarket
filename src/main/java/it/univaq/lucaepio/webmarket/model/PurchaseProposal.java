@@ -39,7 +39,7 @@ public class PurchaseProposal {
     @Column(nullable = false)
     private Double price;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String url;
 
     @Column(columnDefinition = "TEXT")
