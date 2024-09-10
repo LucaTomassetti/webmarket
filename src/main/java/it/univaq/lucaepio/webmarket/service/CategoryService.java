@@ -62,27 +62,47 @@ public class CategoryService {
             tx.begin();
             Category existingCategory = em.find(Category.class, category.getId());
             existingCategory.setName(category.getName());
-            
-            // Rimuovi sottocategorie e caratteristiche esistenti
-            for (Subcategory subcategory : existingCategory.getSubcategories()) {
-                for (Characteristic characteristic : subcategory.getCharacteristics()) {
-                    em.remove(characteristic);
+
+            List<Subcategory> existingSubcategories = existingCategory.getSubcategories();
+
+            for (Subcategory newSubcategory : category.getSubcategories()) {
+                // Cerca una sottocategoria esistente con lo stesso nome
+                Subcategory existingSubcategory = existingSubcategories.stream()
+                    .filter(s -> s.getName().equals(newSubcategory.getName()))
+                    .findFirst()
+                    .orElse(null);
+
+                if (existingSubcategory == null) {
+                    // Questa è una nuova sottocategoria, aggiungiamola
+                    newSubcategory.setCategory(existingCategory);
+                    em.persist(newSubcategory);
+                    existingSubcategories.add(newSubcategory);
+
+                    // Aggiungi tutte le caratteristiche di questa nuova sottocategoria
+                    for (Characteristic characteristic : newSubcategory.getCharacteristics()) {
+                        characteristic.setSubcategory(newSubcategory);
+                        em.persist(characteristic);
+                    }
+                } else {
+                    // La sottocategoria esiste già, aggiorniamo solo il nome se necessario
+                    existingSubcategory.setName(newSubcategory.getName());
+
+                    List<Characteristic> existingCharacteristics = existingSubcategory.getCharacteristics();
+
+                    // Aggiungi solo le nuove caratteristiche
+                    for (Characteristic newCharacteristic : newSubcategory.getCharacteristics()) {
+                        boolean characteristicExists = existingCharacteristics.stream()
+                            .anyMatch(c -> c.getName().equals(newCharacteristic.getName()));
+
+                        if (!characteristicExists) {
+                            newCharacteristic.setSubcategory(existingSubcategory);
+                            em.persist(newCharacteristic);
+                            existingCharacteristics.add(newCharacteristic);
+                        }
+                    }
                 }
-                em.remove(subcategory);
             }
-            existingCategory.getSubcategories().clear();
-            
-            // Aggiungi nuove sottocategorie e caratteristiche
-            for (Subcategory subcategory : category.getSubcategories()) {
-                subcategory.setCategory(existingCategory);
-                em.persist(subcategory);
-                for (Characteristic characteristic : subcategory.getCharacteristics()) {
-                    characteristic.setSubcategory(subcategory);
-                    em.persist(characteristic);
-                }
-                existingCategory.getSubcategories().add(subcategory);
-            }
-            
+
             em.merge(existingCategory);
             tx.commit();
         } catch (Exception e) {
